@@ -66,7 +66,7 @@
                     ]
                 },
                 {
-                    "name": "R4",
+                    "name": "R2",
                     "type": "P",
                     "vrf":[],
                     "interfaces": [
