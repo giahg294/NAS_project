@@ -1,5 +1,5 @@
 {
-    "AS": [
+    "AS":
         {
             "number": "101",
             "IP_range": "130.124.1.0/24",
@@ -8,12 +8,13 @@
             "relation" : "provider",
             "routers": [
                  {
-                    "name": "R1",
-                    "type": "eBGP",
+                    "name": "PE1",
+                    "type": "PE",
+                    "vrf":["Client1","Client2"],
                     "interfaces": [
                         {
                             "name": "FastEthernet0/0",
-                            "neighbor": "R2",
+                            "neighbor": "P2",
                             "neighbor_interface": "FastEthernet0/0"
                         },
                         {
@@ -34,17 +35,18 @@
                     ]
                 },
                 {
-                    "name": "R2",
-                    "type": "iBGP",
+                    "name": "P2",
+                    "type": "P",
+                    "vrf":[],
                     "interfaces": [
                         {
                             "name": "FastEthernet0/0",
-                            "neighbor": "R1",
+                            "neighbor": "PE1",
                             "neighbor_interface": "FastEthernet0/0"
                         },
                         {
                             "name": "GigabitEthernet1/0",
-                            "neighbor": "R3",
+                            "neighbor": "P2",
                             "neighbor_interface": "GigabitEthernet1/0"
                         },
                         {
@@ -60,8 +62,9 @@
                     ]
                 },
                 {
-                    "name": "R3",
-                    "type": "iBGP",
+                    "name": "P2",
+                    "type": "P",
+                    "vrf":[],
                     "interfaces": [
                         {
                             "name": "FastEthernet0/0",
@@ -70,12 +73,12 @@
                         },
                         {
                             "name": "GigabitEthernet1/0",
-                            "neighbor": "R2",
+                            "neighbor": "P1",
                             "neighbor_interface": "GigabitEthernet1/0"
                         },
                         {
                             "name": "GigabitEthernet2/0",
-                            "neighbor": "R4",
+                            "neighbor": "PE2",
                             "neighbor_interface": "GigabitEthernet2/0"
                         },
                         {
@@ -86,8 +89,9 @@
                     ]       
                 },
                 {
-                    "name": "R4",
-                    "type": "eBGP",
+                    "name": "PE2",
+                    "type": "PE",
+                    "vrf":["Client3","Client4"],
                     "interfaces": [
                         {
                             "name": "FastEthernet0/0",
@@ -101,7 +105,7 @@
                         },
                         {
                             "name": "GigabitEthernet2/0",
-                            "neighbor": "R3",
+                            "neighbor": "P2",
                             "neighbor_interface": "GigabitEthernet2/0"
                         },
                         {
@@ -113,5 +117,5 @@
                 }
             ]
         }
-    ]
+    
 }
