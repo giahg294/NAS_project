@@ -2,7 +2,7 @@ from address_allocator import *
 import ipaddress
 
 # Configurer l'en-tête du fichier
-def config_head(name, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMENT CLIENTS A CETTE FONCTION, C'EST LA LISTE DES CLIENTS CONNECTES A UN PE
+def config_head(name, router_type, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMENT CLIENTS A CETTE FONCTION, C'EST LA LISTE DES CLIENTS CONNECTES A UN PE
     config = [
         "!\r"*3,
         "!",
@@ -15,9 +15,9 @@ def config_head(name, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMENT CLIENTS A C
         "boot-start-marker",
         "boot-end-marker",
         "!\r"*2 + "!"]
-    if type == "PE":
+    if router_type == "PE":
         for client in clients:
-            config.append(f" vrf definition {client}\n !\n address-family ipv4\n exit-address-family\n !")
+            config.append(f"vrf definition {client}\n !\n address-family ipv4\n exit-address-family\n !")
 
     fin_config = ["no aaa new-model",
         "no ip icmp rate-limit unreachable",
@@ -29,8 +29,9 @@ def config_head(name, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMENT CLIENTS A C
         "!\r"*8 + "!",
         "ip tcp synwait-time 5",
         "!\r"*11 + "!",]
-    config.append(fin_config)
+    config.extend(fin_config)
     return config
+
 
 # Configure Loopback Interface
 def config_loopback(ip_loopback, protocol):

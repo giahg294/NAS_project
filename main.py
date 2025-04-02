@@ -59,7 +59,9 @@ if __name__ == "__main__":
             router_id = generate_router_id(router.name)
             config = []  # Créer une liste vide pour la configuration
             # Ajouter successivement les configurations de l'en-tête, loopback, interfaces, BGP et de fin
-            config.extend(config_head(router.name, router.vrf))
+            print("OOOOOOOOOOOOOOOOOOOO")
+            print(router.router_type)
+            config.extend(config_head(router.name, router.router_type, router.vrf))
             config.extend(config_loopback(router_loopback, as_index.protocol))
             config.extend(config_interface(router.interfaces, as_index.protocol))
             config.extend(config_bgp(router, router_id, routers_info))
@@ -67,9 +69,12 @@ if __name__ == "__main__":
             
             # Écrire la configuration dans un fichier
             with open(f"i{router.name[1:]}_startup-config.cfg", 'w') as file:
+                print(config)
+                print("ok")
                 file.write('\n'.join(config))  # Écrire le contenu de la configuration
                 source_file.append(f"i{router.name[1:]}_startup-config.cfg")  # Ajouter le nom du fichier à la liste source_file
                 fichiers_config.append(f"i{router.name[1:]}_startup-config.cfg")
+                print("ok")
     
     for i in range(len(fichiers_config)):
         drag_file(i, fichiers_config)
