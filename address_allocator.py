@@ -1,15 +1,15 @@
 # Définition de la classe Router (Routeur)
 class Router:
-    def __init__(self, name, router_type, interfaces, clients):
+    def __init__(self, name, router_type, vrf, interfaces):
         # Initialisation du routeur avec un nom, un type et des interfaces
         self.name = name  # Nom du routeur
         self.router_type = router_type  # Type de routeur (par ex., eBGP, iBGP)
         self.interfaces = interfaces  # Liste des interfaces associées au routeur
-        self.clients = clients
+        self.vrf = vrf
 
     def __str__(self):
         # Représentation textuelle du routeur
-        return f"Router(Name: {self.name}, Type: {self.router_type}, Interfaces: {self.interfaces})"
+        return f"Router(Name: {self.name}, Type: {self.router_type}, VRF: {self.vrf}, Interfaces: {self.interfaces})"
         
 # Définition de la classe AS (Système Autonome)
 class AS:
@@ -20,7 +20,7 @@ class AS:
         self.loopback_range = loopback_range  # Plage d'adresses loopback
         self.protocol = protocol  # Protocole utilisé (RIP, OSPF, etc.)
         # Création d'instances de routeurs pour cet AS
-        self.routers = [Router(router['name'], router['type'], router['interfaces'], router['vrf']) for router in routers]
+        self.routers = [Router(router['name'], router['type'], router['vrf'], router['interfaces']) for router in routers]
         self.relation = relation
 
     def __str__(self):
@@ -63,6 +63,7 @@ def generate_connections_matrix(routers, AS):
     for router in routers:
         router_as = AS[router.name]  # Récupération de l'AS du routeur actuel
         for interface in router.interfaces:
+            print(interface)
             if interface['neighbor'] != "None":  # Vérifie si l'interface est connectée
                 router_index = int(router.name[1:])  # Récupère l'indice du routeur
                 neighbor_index = int(interface['neighbor'][1:])  # Récupère l'indice du voisin
@@ -114,9 +115,10 @@ def generate_router_id(name):
     router_number = ''.join(filter(str.isdigit, name))  # Extrait les chiffres du nom du routeur
     return '.'.join([router_number] * 4)  # Formate l'ID sous forme IPv4-like
 
-def generate_vrf(router):
-    clients = router["vrf"]
-    return clients
+def generate_vrf(as_index):
+    for router in as_index:
+        router.vrf
+        
 
 # Génération d'un dictionnaire contenant les informations des routeurs
 def generate_routers_dict(all_as):
