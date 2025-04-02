@@ -66,11 +66,7 @@
                     ]
                 },
                 {
-<<<<<<< HEAD
                     "name": "R3",
-=======
-                    "name": "R2",
->>>>>>> 5176ae81046effbaecc1d3505dfcd3028c86aa90
                     "type": "P",
                     "vrf":[],
                     "interfaces": [
