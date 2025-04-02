@@ -40,7 +40,7 @@ if __name__ == "__main__":
     source_file = []
     
     connections_matrix = generate_connections_matrix(all_routers, as_mapping)
-    print(connections_matrix)
+    # print(connections_matrix)
 
     # Parcourir tous les AS et les routeurs dans chaque AS pour générer les adresses des interfaces pour chaque routeur
     for as_index in all_as:
