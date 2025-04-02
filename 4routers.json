@@ -14,7 +14,7 @@
                     "interfaces": [
                         {
                             "name": "FastEthernet0/0",
-                            "neighbor": "R3",
+                            "neighbor": "R2",
                             "neighbor_interface": "FastEthernet0/0",
                             "vrf":["Client1"]
                         },
@@ -39,7 +39,7 @@
                     ]
                 },
                 {
-                    "name": "R3",
+                    "name": "R2",
                     "type": "P",
                     "vrf":[],
                     "interfaces": [
@@ -66,7 +66,7 @@
                     ]
                 },
                 {
-                    "name": "R4",
+                    "name": "R3",
                     "type": "P",
                     "vrf":[],
                     "interfaces": [
