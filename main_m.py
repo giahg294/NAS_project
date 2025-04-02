@@ -57,9 +57,9 @@ def modif_config(lines, dico, AS_name, routeur, indice_routeur):
 
         # AJOUT POUR CHAQUE PE D'UNE VRF POUR CHAQUE CLIENT QUI LUI EST CONNECTE
         if line.startswith("boot-end-marker"):
-            if dico["AS"]["routers"][indice_routeur]["type"] == "PE"
-            for client in dico["AS"]["routers"][indice_routeur]["vrf"]:
-                updated_lines.append(f"boot-end-marker\n!\n!\nvrf definition{client}\n !\n address-family ipv4\n exit-address-family")
+            if dico["AS"]["routers"][indice_routeur]["type"] == "PE":
+                for client in dico["AS"]["routers"][indice_routeur]["vrf"]:
+                    updated_lines.append(f"boot-end-marker\n!\n!\nvrf definition{client}\n !\n address-family ipv4\n exit-address-family")
 
         # CONFIGURATION DES INTERFACES
 

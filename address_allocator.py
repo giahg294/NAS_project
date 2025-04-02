@@ -1,10 +1,11 @@
 # Définition de la classe Router (Routeur)
 class Router:
-    def __init__(self, name, router_type, interfaces):
+    def __init__(self, name, router_type, interfaces, clients):
         # Initialisation du routeur avec un nom, un type et des interfaces
         self.name = name  # Nom du routeur
         self.router_type = router_type  # Type de routeur (par ex., eBGP, iBGP)
         self.interfaces = interfaces  # Liste des interfaces associées au routeur
+        self.clients = clients
 
     def __str__(self):
         # Représentation textuelle du routeur
@@ -19,7 +20,7 @@ class AS:
         self.loopback_range = loopback_range  # Plage d'adresses loopback
         self.protocol = protocol  # Protocole utilisé (RIP, OSPF, etc.)
         # Création d'instances de routeurs pour cet AS
-        self.routers = [Router(router['name'], router['type'], router['interfaces']) for router in routers]
+        self.routers = [Router(router['name'], router['type'], router['interfaces'], router['vrf']) for router in routers]
         self.relation = relation
 
     def __str__(self):
@@ -112,6 +113,10 @@ def generate_interface_addresses(routers, connections_matrix):
 def generate_router_id(name):
     router_number = ''.join(filter(str.isdigit, name))  # Extrait les chiffres du nom du routeur
     return '.'.join([router_number] * 4)  # Formate l'ID sous forme IPv4-like
+
+def generate_vrf(router):
+    clients = router["vrf"]
+    return clients
 
 # Génération d'un dictionnaire contenant les informations des routeurs
 def generate_routers_dict(all_as):
