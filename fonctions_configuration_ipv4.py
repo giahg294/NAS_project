@@ -72,7 +72,7 @@ def config_interface(interfaces, protocol):
             else:
                 config.append(" negotiation auto")
             if 'ipv4_address' in interface.keys():
-                config.append(f" ip address {interface['ipv4_address']}/30")
+                config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
             if protocol == "OSPF":
                 config.append(f" ip ospf 1 area 0")
         
