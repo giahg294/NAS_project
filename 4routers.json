@@ -126,7 +126,7 @@
             "number": "222",
             "IP_range": "130.124.1.0 255.255.255.252",
             "loopback_range": "130.124.0.0 255.255.255.255",
-            "protocol": "OSPF",
+            "protocol": "",
             "relation" : "client",
             "routers": [
                 {
@@ -193,7 +193,7 @@
             "number": "222",
             "IP_range": "130.124.1.0 255.255.255.252",
             "loopback_range": "130.124.0.0 255.255.255.255",
-            "protocol": "OSPF",
+            "protocol": "",
             "relation" : "client",
             "routers": [
                 {

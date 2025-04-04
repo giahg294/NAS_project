@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     # Extraire les informations AS du JSON, créer des instances de la classe AS, les stocker dans la liste all_as
     as_info = data["AS"]
-    all_as = [AS(as_info['number'], as_info['IP_range'], as_info['loopback_range'], as_info['protocol'], as_info['routers'], as_info['relation'], as_info['num_ospf'])]
+    all_as = [AS(as_info['number'], as_info['IP_range'], as_info['loopback_range'], as_info['protocol'], as_info['routers'], as_info['relation'])]
 
     all_as_dict = generate_as_dict(all_as)
     # print(all_as_dict)  
@@ -61,8 +61,8 @@ if __name__ == "__main__":
             config = []  # Créer une liste vide pour la configuration
             # Ajouter successivement les configurations de l'en-tête, loopback, interfaces, BGP et de fin
             config.extend(config_head(router.name, router.router_type, router.vrf))
-            config.extend(config_loopback(router_loopback, as_index.protocol, as_index.num_ospf))
-            config.extend(config_interface(router.interfaces, as_index.protocol, as_index.num_ospf))
+            config.extend(config_loopback(router_loopback, as_index.protocol))
+            config.extend(config_interface(router.interfaces, as_index.protocol))
             config.extend(config_bgp(router, router_id, routers_info))
             config.extend(config_end(as_index.protocol, router_id))
             

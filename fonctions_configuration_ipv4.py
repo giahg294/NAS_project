@@ -46,21 +46,26 @@ def config_head(name, router_type, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMEN
 
 
 # Configure Loopback Interface
-def config_loopback(ip_loopback, protocol, num_ospf):
+def config_loopback(ip_loopback, protocol):
     config = []
     config.append("interface Loopback0")
     config.append(f" ip address {ip_loopback} 255.255.255.255")
-    config.append(f" ip ospf {num_ospf} area 0")
+    config.append(f" ip ospf 1 area 0")
     config.append("!")
     return config
 
 # Configure each interface
-def config_interface(interfaces, protocol, num_ospf):
+def config_interface(interfaces, protocol):
     config = []
     for interface in interfaces:
         config.append(f"interface {interface['name']}")
         if interface['neighbor'] == "None":
             config.append(" shutdown")
+        if interface["vrf"] != []:
+            config.append(f" vrf forwarding {interface["vrf"]}")
+        #Ligne à optimiser !
+        if interface['neighbor'] != "None" and interface["vrf"] == []:
+            config.append(" mpls ip")
         else:
             if interface['name'] == "FastEthernet0/0":
                 config.append(" duplex full")
@@ -69,11 +74,11 @@ def config_interface(interfaces, protocol, num_ospf):
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']}/30")
             if protocol == "OSPF":
-                config.append(f" ip ospf {num_ospf} area 0")
+                config.append(f" ip ospf 1 area 0")
         
         if protocol == "OSPF":
             config.append("!")
-            config.append(f"router ospf {num_ospf}")
+            config.append(f"router ospf 1")
             
     
     return config
