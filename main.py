@@ -21,8 +21,8 @@ if __name__ == "__main__":
         data = json.load(file)
 
     # Extraire les informations AS du JSON, créer des instances de la classe AS, les stocker dans la liste all_as
-    as_info = data["AS"]
-    all_as = [AS(as_info['number'], as_info['IP_range'], as_info['loopback_range'], as_info['protocol'], as_info['routers'], as_info['relation'])]
+    all_as = [AS(as_info['number'], as_info['IP_range'], as_info['loopback_range'], as_info['protocol'], as_info['routers'], as_info['relation'])
+              for as_info in data["AS"]]
 
     all_as_dict = generate_as_dict(all_as)
     # print(all_as_dict)  
