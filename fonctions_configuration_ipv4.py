@@ -15,14 +15,17 @@ def config_head(name, router_type, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMEN
         "boot-start-marker",
         "boot-end-marker",
         "!\r"*2 + "!"]
-    if router_type == "PE":
+    
+    
+    if router_type != "P":
         for client in clients:
             config.append(f"vrf definition {client}\n")
-            "rd {numéro d'AS}:{nb aléatoire différent pour chaque client}"
-            "route-target export {numéro d'AS}:{nb aléatoire différent pour chaque client}"
-            "route-target import {numéro d'AS}:{nb aléatoire différent pour chaque client}"
-            "\n !\n address-family ipv4\n exit-address-family\n !"
-
+            if router_type == "PE":
+                "rd {numéro d'AS}:{nb aléatoire différent pour chaque client}"
+                "route-target export {numéro d'AS}:{nb aléatoire différent pour chaque client}"
+                "route-target import {numéro d'AS}:{nb aléatoire différent pour chaque client}"
+            config.append("\n !\n address-family ipv4\n exit-address-family\n !")
+            
     fin_config = ["no aaa new-model",
         "no ip icmp rate-limit unreachable",
         "ip cef",
@@ -40,16 +43,16 @@ def config_head(name, router_type, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMEN
 
 
 # Configure Loopback Interface
-def config_loopback(ip_loopback, protocol):
+def config_loopback(ip_loopback, protocol, num_ospf):
     config = []
     config.append("interface Loopback0")
-    config.append(f" ip address {ip_loopback}/32")
-    config.append(" ip ospf 1 area 0")
+    config.append(f" ip address {ip_loopback} 255.255.255.255")
+    config.append(f" ip ospf {num_ospf} area 0")
     config.append("!")
     return config
 
 # Configure each interface
-def config_interface(interfaces, protocol):
+def config_interface(interfaces, protocol, num_ospf):
     config = []
     for interface in interfaces:
         config.append(f"interface {interface['name']}")
@@ -63,29 +66,15 @@ def config_interface(interfaces, protocol):
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']}/30")
             if protocol == "OSPF":
-                config.append(" ip ospf 1 area 0")
+                config.append(f" ip ospf {num_ospf} area 0")
         
         if protocol == "OSPF":
             config.append("!")
-            config.append("router ospf 1")
+            config.append(f"router ospf {num_ospf}")
             
     
     return config
 
-def config_network(current_as, routers, routers_dict, neighbor_dico):
-    networks = []
-    for routeur in routers:
-        if routeur.name in neighbor_dico.keys() or (current_as == routers_dict[routeur.name]['AS'] and routeur.router_type == 'iBGP'):
-            for interface in routeur.interfaces:
-                ip_addr = interface['ipv4_address']
-                if ip_addr:
-                    try:
-                        network = ipaddress.IPv4Network(ip_addr, strict=False)
-                        if network not in networks : 
-                            networks.append(network)
-                    except ValueError:
-                        print(f"Invalid IP addresse: {ip_addr}")
-    return networks
 
 # Configure BGP Neighbor
 def config_bgp(router, router_id, routers_dict):

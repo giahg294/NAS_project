@@ -13,7 +13,7 @@ class Router:
         
 # Définition de la classe AS (Système Autonome)
 class AS:
-    def __init__(self, number, ip_range, loopback_range, protocol, routers, relation):
+    def __init__(self, number, ip_range, loopback_range, protocol, routers, relation, num_ospf):
         # Initialisation de l'AS avec son numéro, plages d'adresses, protocole et routeurs
         self.number = number  # Numéro de l'AS
         self.ip_range = ip_range  # Plage d'adresses IP pour cet AS
@@ -22,6 +22,7 @@ class AS:
         # Création d'instances de routeurs pour cet AS
         self.routers = [Router(router['name'], router['type'], router['vrf'], router['interfaces']) for router in routers]
         self.relation = relation
+        self.num_ospf = num_ospf
 
     def __str__(self):
         # Représentation textuelle de l'AS
