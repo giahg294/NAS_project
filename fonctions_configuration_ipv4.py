@@ -17,14 +17,20 @@ def config_head(name, router_type, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMEN
         "!\r"*2 + "!"]
     if router_type == "PE":
         for client in clients:
-            config.append(f"vrf definition {client}\n !\n address-family ipv4\n exit-address-family\n !")
+            config.append(f"vrf definition {client}\n")
+            "rd {numéro d'AS}:{nb aléatoire différent pour chaque client}"
+            "route-target export {numéro d'AS}:{nb aléatoire différent pour chaque client}"
+            "route-target import {numéro d'AS}:{nb aléatoire différent pour chaque client}"
+            "\n !\n address-family ipv4\n exit-address-family\n !"
 
     fin_config = ["no aaa new-model",
         "no ip icmp rate-limit unreachable",
         "ip cef",
         "!\r"*5 + "!",
         "no ip domain lookup",
+        "no ipv6 cef",
         "!\r!",
+        "mpls label protocol ldp",
         "multilink bundle-name authenticated",
         "!\r"*8 + "!",
         "ip tcp synwait-time 5",
@@ -38,12 +44,7 @@ def config_loopback(ip_loopback, protocol):
     config = []
     config.append("interface Loopback0")
     config.append(f" ip address {ip_loopback}/32")
-
-    if protocol == "RIP":
-        config.append(" ip rip advertise")
-    if protocol == "OSPF":
-        config.append(" ip ospf 1 area 0")
-
+    config.append(" ip ospf 1 area 0")
     config.append("!")
     return config
 
@@ -61,14 +62,13 @@ def config_interface(interfaces, protocol):
                 config.append(" negotiation auto")
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']}/30")
-            if protocol == "RIP":
-                config.append(" ip rip advertise")
-            elif protocol == "OSPF":
+            if protocol == "OSPF":
                 config.append(" ip ospf 1 area 0")
         
         if protocol == "OSPF":
             config.append("!")
             config.append("router ospf 1")
+            
     
     return config
 
@@ -119,10 +119,7 @@ def config_end(protocol, router_id):
         "!"
     ]
 
-    if protocol == "RIP":
-        config.append("router rip")
-        config.append(" version 2")
-        config.append(" redistribute connected")
+    "Les lignes suivantes sont à un autre endroit dans le fichier de config : à tester si ça marche ici"
     if protocol == "OSPF":
         config.append("router ospf 1")
         config.append(f" router-id {router_id}")
@@ -131,6 +128,11 @@ def config_end(protocol, router_id):
     config.append("control-plane")
     config.append("!\r!")
     config.append("line con 0")
+    config.append(" exec-timeout 0 0")
+    config.append(" privilege level 15")
+    config.append(" logging synchronous")
+    config.append(" stopbits 1")
+    config.append("line aux 0")
     config.append(" exec-timeout 0 0")
     config.append(" privilege level 15")
     config.append(" logging synchronous")
