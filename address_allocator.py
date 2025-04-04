@@ -63,7 +63,6 @@ def generate_connections_matrix(routers, AS):
     for router in routers:
         router_as = AS[router.name]  # Récupération de l'AS du routeur actuel
         for interface in router.interfaces:
-            print(interface)
             if interface['neighbor'] != "None":  # Vérifie si l'interface est connectée
                 router_index = int(router.name[1:])  # Récupère l'indice du routeur
                 neighbor_index = int(interface['neighbor'][1:])  # Récupère l'indice du voisin
@@ -76,8 +75,8 @@ def generate_connections_matrix(routers, AS):
                     state = router_as
 
                 # Crée une connexion triée pour éviter les doublons
-                connection = tuple(sorted([neighbor_index, router_index]))
-                connection = (connection, state)
+                connection = sorted([neighbor_index, router_index])
+                connection = [connection, state]
 
                 # Ajoute la connexion si elle n'est pas encore enregistrée
                 if connection not in connections:
@@ -94,21 +93,43 @@ def generate_loopback(name, loopback_range):
 
 # Génération des adresses IPv4 pour les interfaces
 def generate_interface_addresses(as_info, connections_matrix):
+    # print(f"    as_info : {as_info}")
+    # print(f"    connections_matrix : {connections_matrix}")
     ip_range = as_info.ip_range
-    subnet = 0
-    for lien in connections_matrix:
-        i = subnet
-        for router in lien[0]:
+    i = 0
+    all_lien_as = []
+    all_lien = connections_matrix
+    traites = []
+    print(all_lien)
+    for lien in all_lien:
+        if lien[1] == as_info.number:
+            all_lien_as.append(lien[0])
+
+    print(all_lien_as)        
+    for lien in all_lien_as:
+        for router in lien:
             for r in as_info.routers:
-                if router == int(r.name[1:]):
+                if router == int(r.name[1:]) and router not in traites:
                     for interface in r.interfaces:
                         if interface['neighbor'] != "None":
-                            ip = subnet+1+i
-                            ipv4_address = f"{ip_range[:-17]}{ip}"
-                            interface['ipv4_address'] = ipv4_address
-                            print(f"{r.name}{interface} --> {ipv4_address}")
-            i += 1
-        subnet += 2
+                            print(lien[0],lien[1])
+                            print(interface['neighbor'][1:])
+                            if int(interface['neighbor'][1:]) == lien[0] or int(interface['neighbor'][1:])==lien[1]:
+                                print("neighbor in lien")
+                                i += 1
+                                ip = i
+                                ipv4_address = f"{ip_range[:-17]}{ip}"
+                                interface['ipv4_address'] = ipv4_address
+                                print(f"{r.name}{interface} --> {ipv4_address}")
+                                
+                            else:
+                                print("neighbor not in lien")
+                                ip = i+3
+                                ipv4_address = f"{ip_range[:-17]}{ip}"
+                                interface['ipv4_address'] = ipv4_address
+                                print(f"{r.name}{interface} --> {ipv4_address}")
+                                i = ip
+            traites.append(router)
 
 # Génération de l'ID routeur (Router ID)
 def generate_router_id(name):
