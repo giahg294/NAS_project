@@ -3,7 +3,7 @@ class Router:
     def __init__(self, name, router_type, vrf, interfaces):
         # Initialisation du routeur avec un nom, un type et des interfaces
         self.name = name  # Nom du routeur
-        self.router_type = router_type  # Type de routeur (par ex., eBGP, iBGP)
+        self.router_type = router_type  # Type de routeur (CE, PE, P)
         self.interfaces = interfaces  # Liste des interfaces associées au routeur
         self.vrf = vrf
 

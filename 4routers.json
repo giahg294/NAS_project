@@ -11,19 +11,19 @@
                  {
                     "name": "R1",
                     "type": "PE",
-                    "vrf": ["Client1","Client2"],
+                    "vrf": ["Client1_a","Client2_a"],
                     "interfaces": [
                         {
                             "name": "FastEthernet0/0",
                             "neighbor": "R2",
                             "neighbor_interface": "FastEthernet0/0",
-                            "vrf": "Client1"
+                            "vrf": "Client1_a"
                         },
                         {
                             "name": "GigabitEthernet1/0",
                             "neighbor": "None",
                             "neighbor_interface": "None",
-                            "vrf": "Client2"
+                            "vrf": "Client2_a"
                         },
                         {
                             "name": "GigabitEthernet2/0",
@@ -104,19 +104,19 @@
                 {
                     "name": "R4",
                     "type": "PE",
-                    "vrf":["Client3","Client4"],
+                    "vrf":["Client1_b","Client2_b"],
                     "interfaces": [
                         {
                             "name": "FastEthernet0/0",
                             "neighbor": "None",
                             "neighbor_interface": "None",
-                            "vrf":[]
+                            "vrf":"Client1_b"
                         },
                         {
                             "name": "GigabitEthernet1/0",
                             "neighbor": "None",
                             "neighbor_interface": "None",
-                            "vrf":[]
+                            "vrf":"Client2_b"
                         },
                         {
                             "name": "GigabitEthernet2/0",
