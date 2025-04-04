@@ -2,7 +2,7 @@ from address_allocator import *
 import ipaddress
 
 # Configurer l'en-tête du fichier
-def config_head(name, router_type, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMENT CLIENTS A CETTE FONCTION, C'EST LA LISTE DES CLIENTS CONNECTES A UN PE
+def config_head(name, router_type, clients, as_number): #ATTENTION : J'AI RAJOUTE L'ARGUMENT CLIENTS A CETTE FONCTION, C'EST LA LISTE DES CLIENTS CONNECTES A UN PE
     config = [
         "!\r"*3,
         "!",
@@ -19,12 +19,12 @@ def config_head(name, router_type, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMEN
     
     if router_type != "P":
         for client in clients:
-            config.append(f"vrf definition {client}\n")
+            config.append(f"vrf definition {client}")
             if router_type == "PE":
-                "rd {numéro d'AS}:{nb aléatoire différent pour chaque client}"
-                "route-target export {numéro d'AS}:{nb aléatoire différent pour chaque client}"
-                "route-target import {numéro d'AS}:{nb aléatoire différent pour chaque client}"
-            config.append("\n !\n address-family ipv4\n exit-address-family\n !")
+                config.append(f" rd {as_number}:{as_number}")
+                config.append(f" route-target export {as_number}:{as_number}")
+                config.append(f" route-target import {as_number}:{as_number}")
+            config.append(" !\n address-family ipv4\n exit-address-family\n!")
             
     suite_config = ["no aaa new-model",
         "no ip icmp rate-limit unreachable",
@@ -73,21 +73,21 @@ def config_interface(interfaces, protocol):
                 config.append(" negotiation auto")
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
-            if protocol == "OSPF":
+            if protocol == "OSPF" and interface["vrf"] == []:
                 config.append(f" ip ospf 1 area 0")
-        
-        if protocol == "OSPF":
-            config.append("!")
-            config.append(f"router ospf 1")
+        config.append("!")
             
     
     return config
 
 
 # Configure BGP Neighbor
-def config_bgp(router, router_id, routers_dict):
-    # Configurer les voisins BGP
+def config_bgp(router, router_id, routers_dict, router_type):
     config = []
+    if router_type != "CE":
+        config.append("router ospf 1")
+        config.append(f" router-id {router_id} \n!")
+    # Configurer les voisins BGP
     current_as = routers_dict[router.name]['AS']
     config.append(f"router bgp {current_as}")
     config.append(f" bgp router-id {router_id}")
@@ -97,7 +97,7 @@ def config_bgp(router, router_id, routers_dict):
         if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
             neighbor_ip = routers_dict[neighbor]['loopback']
             config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-            config.append(f" neighbor {neighbor_ip} update-source Loopback0")
+            config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
 
     config.append("!")
     config.append(" address-family ipv4")
@@ -115,11 +115,6 @@ def config_end(protocol, router_id):
         "no ip http secure-server",
         "!"
     ]
-
-    "Les lignes suivantes sont à un autre endroit dans le fichier de config : à tester si ça marche ici"
-    if protocol == "OSPF":
-        config.append("router ospf 1")
-        config.append(f" router-id {router_id}")
 
     config.append("!\r"*3 + "!")
     config.append("control-plane")
