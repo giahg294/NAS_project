@@ -60,7 +60,7 @@ if __name__ == "__main__":
             router_id = generate_router_id(router.name)
             config = []  # Créer une liste vide pour la configuration
             # Ajouter successivement les configurations de l'en-tête, loopback, interfaces, BGP et de fin
-            config.extend(config_head(router.name, router.router_type, router.vrf))
+            config.extend(config_head(router.name, router.router_type, router.vrf, as_index.number))
             config.extend(config_loopback(router_loopback, as_index.protocol))
             config.extend(config_interface(router.interfaces, as_index.protocol))
             config.extend(config_bgp(router, router_id, routers_info))

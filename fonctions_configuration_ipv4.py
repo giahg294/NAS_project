@@ -2,7 +2,7 @@ from address_allocator import *
 import ipaddress
 
 # Configurer l'en-tête du fichier
-def config_head(name, router_type, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMENT CLIENTS A CETTE FONCTION, C'EST LA LISTE DES CLIENTS CONNECTES A UN PE
+def config_head(name, router_type, clients, as_number): #ATTENTION : J'AI RAJOUTE L'ARGUMENT CLIENTS A CETTE FONCTION, C'EST LA LISTE DES CLIENTS CONNECTES A UN PE
     config = [
         "!\r"*3,
         "!",
@@ -21,9 +21,9 @@ def config_head(name, router_type, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMEN
         for client in clients:
             config.append(f"vrf definition {client}\n")
             if router_type == "PE":
-                "rd {numéro d'AS}:{nb aléatoire différent pour chaque client}"
-                "route-target export {numéro d'AS}:{nb aléatoire différent pour chaque client}"
-                "route-target import {numéro d'AS}:{nb aléatoire différent pour chaque client}"
+                config.append(f" rd {as_number}:{as_number}\n")
+                config.append(f" route-target export {as_number}:{as_number}\n")
+                config.append(f" route-target import {as_number}:{as_number}\n")
             config.append("\n !\n address-family ipv4\n exit-address-family\n !")
             
     suite_config = ["no aaa new-model",
