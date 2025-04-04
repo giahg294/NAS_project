@@ -1,28 +1,29 @@
 {
     "AS":
-        {
+        [
+            {
             "number": "101",
-            "IP_range": "130.124.1.0/24",
-            "loopback_range": "130.124.0.0/24",
+            "IP_range": "130.124.1.0 255.255.255.252",
+            "loopback_range": "130.124.0.0 255.255.255.255",
             "protocol": "OSPF",
             "relation" : "provider",
             "routers": [
                  {
                     "name": "R1",
                     "type": "PE",
-                    "vrf":["Client1","Client2"],
+                    "vrf": ["Client1","Client2"],
                     "interfaces": [
                         {
                             "name": "FastEthernet0/0",
                             "neighbor": "R2",
                             "neighbor_interface": "FastEthernet0/0",
-                            "vrf":["Client1"]
+                            "vrf": "Client1"
                         },
                         {
                             "name": "GigabitEthernet1/0",
                             "neighbor": "None",
                             "neighbor_interface": "None",
-                            "vrf":["Client2"]
+                            "vrf": "Client2"
                         },
                         {
                             "name": "GigabitEthernet2/0",
@@ -120,6 +121,140 @@
                     ]
                 }
             ]
+        },
+            {
+            "number": "222",
+            "IP_range": "130.124.1.0 255.255.255.252",
+            "loopback_range": "130.124.0.0 255.255.255.255",
+            "protocol": "OSPF",
+            "relation" : "client",
+            "routers": [
+                {
+                    "name": "R5",
+                    "type": "CE",
+                    "vrf":[""],
+                    "interfaces": [
+                        {
+                            "name": "FastEthernet0/0",
+                            "neighbor": "R6",
+                            "neighbor_interface": "FastEthernet0/0",
+                            "vrf": ""
+                        },
+                        {
+                            "name": "GigabitEthernet1/0",
+                            "neighbor": "None",
+                            "neighbor_interface": "None",
+                            "vrf": ""
+                        },
+                        {
+                            "name": "GigabitEthernet2/0",
+                            "neighbor": "None",
+                            "neighbor_interface": "None",
+                            "vrf":[]
+                        },
+                        {
+                            "name": "GigabitEthernet3/0",
+                            "neighbor": "None",
+                            "neighbor_interface": "None",
+                            "vrf":[]
+                        }
+                    ]
+                },
+                {
+                    "name": "R6",
+                    "type": "CE",
+                    "vrf":[],
+                    "interfaces": [
+                        {
+                            "name": "FastEthernet0/0",
+                            "neighbor": "R5",
+                            "neighbor_interface": "FastEthernet0/0"
+                        },
+                        {
+                            "name": "GigabitEthernet1/0",
+                            "neighbor": "None",
+                            "neighbor_interface": "GigabitEthernet1/0"
+                        },
+                        {
+                            "name": "GigabitEthernet2/0",
+                            "neighbor": "None",
+                            "neighbor_interface": "None"
+                        },
+                        {
+                            "name": "GigabitEthernet3/0",
+                            "neighbor": "None",
+                            "neighbor_interface": "None"
+                        }
+                    ]
+                }
+            ]
+        },
+            {
+            "number": "222",
+            "IP_range": "130.124.1.0 255.255.255.252",
+            "loopback_range": "130.124.0.0 255.255.255.255",
+            "protocol": "OSPF",
+            "relation" : "client",
+            "routers": [
+                {
+                    "name": "R7",
+                    "type": "CE",
+                    "vrf":[""],
+                    "interfaces": [
+                        {
+                            "name": "FastEthernet0/0",
+                            "neighbor": "R8",
+                            "neighbor_interface": "FastEthernet0/0",
+                            "vrf": ""
+                        },
+                        {
+                            "name": "GigabitEthernet1/0",
+                            "neighbor": "None",
+                            "neighbor_interface": "None",
+                            "vrf": ""
+                        },
+                        {
+                            "name": "GigabitEthernet2/0",
+                            "neighbor": "None",
+                            "neighbor_interface": "None",
+                            "vrf":[]
+                        },
+                        {
+                            "name": "GigabitEthernet3/0",
+                            "neighbor": "None",
+                            "neighbor_interface": "None",
+                            "vrf":[]
+                        }
+                    ]
+                },
+                {
+                    "name": "R8",
+                    "type": "CE",
+                    "vrf":[],
+                    "interfaces": [
+                        {
+                            "name": "FastEthernet0/0",
+                            "neighbor": "R7",
+                            "neighbor_interface": "FastEthernet0/0"
+                        },
+                        {
+                            "name": "GigabitEthernet1/0",
+                            "neighbor": "None",
+                            "neighbor_interface": "GigabitEthernet1/0"
+                        },
+                        {
+                            "name": "GigabitEthernet2/0",
+                            "neighbor": "None",
+                            "neighbor_interface": "None"
+                        },
+                        {
+                            "name": "GigabitEthernet3/0",
+                            "neighbor": "None",
+                            "neighbor_interface": "None"
+                        }
+                    ]
+                }
+            ]
         }
-    
-}
+    ]
+}    
