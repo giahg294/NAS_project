@@ -149,22 +149,26 @@
                         {
                             "name": "FastEthernet0/0",
                             "neighbor": "R6",
-                            "neighbor_interface": "FastEthernet0/0"
+                            "neighbor_interface": "FastEthernet0/0",
+                            "vrf":[]
                         },
                         {
                             "name": "GigabitEthernet1/0",
                             "neighbor": "None",
-                            "neighbor_interface": "None"
+                            "neighbor_interface": "None",
+                            "vrf":[]
                         },
                         {
                             "name": "GigabitEthernet2/0",
                             "neighbor": "None",
-                            "neighbor_interface": "None"
+                            "neighbor_interface": "None",
+                            "vrf":[]
                         },
                         {
                             "name": "GigabitEthernet3/0",
                             "neighbor": "None",
-                            "neighbor_interface": "None"
+                            "neighbor_interface": "None",
+                            "vrf":[]
                         }
                     ]
                 },
@@ -176,22 +180,26 @@
                         {
                             "name": "FastEthernet0/0",
                             "neighbor": "R5",
-                            "neighbor_interface": "FastEthernet0/0"
+                            "neighbor_interface": "FastEthernet0/0",
+                            "vrf":[]
                         },
                         {
                             "name": "GigabitEthernet1/0",
                             "neighbor": "None",
-                            "neighbor_interface": "GigabitEthernet1/0"
+                            "neighbor_interface": "GigabitEthernet1/0",
+                            "vrf":[]
                         },
                         {
                             "name": "GigabitEthernet2/0",
                             "neighbor": "None",
-                            "neighbor_interface": "None"
+                            "neighbor_interface": "None",
+                            "vrf":[]
                         },
                         {
                             "name": "GigabitEthernet3/0",
                             "neighbor": "None",
-                            "neighbor_interface": "None"
+                            "neighbor_interface": "None",
+                            "vrf":[]
                         }
                     ]
                 }
