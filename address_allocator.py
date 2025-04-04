@@ -100,34 +100,28 @@ def generate_interface_addresses(as_info, connections_matrix):
     all_lien_as = []
     all_lien = connections_matrix
     traites = []
-    print(all_lien)
     for lien in all_lien:
         if lien[1] == as_info.number:
             all_lien_as.append(lien[0])
 
-    print(all_lien_as)        
     for lien in all_lien_as:
         for router in lien:
             for r in as_info.routers:
                 if router == int(r.name[1:]) and router not in traites:
                     for interface in r.interfaces:
                         if interface['neighbor'] != "None":
-                            print(lien[0],lien[1])
-                            print(interface['neighbor'][1:])
                             if int(interface['neighbor'][1:]) == lien[0] or int(interface['neighbor'][1:])==lien[1]:
-                                print("neighbor in lien")
                                 i += 1
                                 ip = i
                                 ipv4_address = f"{ip_range[:-17]}{ip}"
                                 interface['ipv4_address'] = ipv4_address
-                                print(f"{r.name}{interface} --> {ipv4_address}")
+                                # print(f"{r.name}{interface} --> {ipv4_address}")
                                 
                             else:
-                                print("neighbor not in lien")
                                 ip = i+3
                                 ipv4_address = f"{ip_range[:-17]}{ip}"
                                 interface['ipv4_address'] = ipv4_address
-                                print(f"{r.name}{interface} --> {ipv4_address}")
+                                # print(f"{r.name}{interface} --> {ipv4_address}")
                                 i = ip
             traites.append(router)
 
