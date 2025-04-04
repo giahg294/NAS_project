@@ -21,8 +21,8 @@
                         },
                         {
                             "name": "GigabitEthernet1/0",
-                            "neighbor": "None",
-                            "neighbor_interface": "None",
+                            "neighbor": "R5",
+                            "neighbor_interface": "GigabitEthernet1/0",
                             "vrf": "Client2_a"
                         },
                         {
@@ -114,8 +114,8 @@
                         },
                         {
                             "name": "GigabitEthernet1/0",
-                            "neighbor": "None",
-                            "neighbor_interface": "None",
+                            "neighbor": "R7",
+                            "neighbor_interface": "GigabitEthernet1/0",
                             "vrf":"Client2_b"
                         },
                         {
@@ -154,8 +154,8 @@
                         },
                         {
                             "name": "GigabitEthernet1/0",
-                            "neighbor": "None",
-                            "neighbor_interface": "None",
+                            "neighbor": "R1",
+                            "neighbor_interface": "GigabitEthernet1/0",
                             "vrf":[]
                         },
                         {
@@ -174,7 +174,7 @@
                 },
                 {
                     "name": "R6",
-                    "type": "CE",
+                    "type": "C",
                     "vrf":[],
                     "interfaces": [
                         {
@@ -225,8 +225,8 @@
                         },
                         {
                             "name": "GigabitEthernet1/0",
-                            "neighbor": "None",
-                            "neighbor_interface": "None",
+                            "neighbor": "R4",
+                            "neighbor_interface": "GigabitEthernet1/0",
                             "vrf": []
                         },
                         {
@@ -245,7 +245,7 @@
                 },
                 {
                     "name": "R8",
-                    "type": "CE",
+                    "type": "C",
                     "vrf":[],
                     "interfaces": [
                         {
