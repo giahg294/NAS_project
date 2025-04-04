@@ -26,18 +26,21 @@ def config_head(name, router_type, clients): #ATTENTION : J'AI RAJOUTE L'ARGUMEN
                 "route-target import {numéro d'AS}:{nb aléatoire différent pour chaque client}"
             config.append("\n !\n address-family ipv4\n exit-address-family\n !")
             
-    fin_config = ["no aaa new-model",
+    suite_config = ["no aaa new-model",
         "no ip icmp rate-limit unreachable",
         "ip cef",
         "!\r"*5 + "!",
         "no ip domain lookup",
         "no ipv6 cef",
-        "!\r!",
-        "mpls label protocol ldp",
+        "!\r!"]
+    if router_type != "CE":
+        suite_config.append("mpls label protocol ldp")
+    fin_config = [
         "multilink bundle-name authenticated",
         "!\r"*8 + "!",
         "ip tcp synwait-time 5",
         "!\r"*11 + "!",]
+    config.extend(suite_config)
     config.extend(fin_config)
     return config
 
