@@ -22,7 +22,8 @@ if __name__ == "__main__":
 
     # Extraire les informations AS du JSON, créer des instances de la classe AS, les stocker dans la liste all_as
     as_info = data["AS"]
-    all_as = [AS(as_info['number'], as_info['IP_range'], as_info['loopback_range'], as_info['protocol'], as_info['routers'], as_info['relation'])]
+    all_as = [AS(as_info['number'], as_info['IP_range'], as_info['loopback_range'], as_info['protocol'], as_info['routers'], as_info['relation'])
+              for as_info in data['AS']]
 
     all_as_dict = generate_as_dict(all_as)
     # print(all_as_dict)  
@@ -30,7 +31,6 @@ if __name__ == "__main__":
     as_mapping = {}
     for as_index in all_as: 
         for router in as_index.routers:  
-            print(router)
             as_mapping[router.name] = as_index.number  # Mapper le nom du routeur au numéro de l'AS auquel il appartient
 
     # Créer une liste contenant tous les routeurs
@@ -48,6 +48,8 @@ if __name__ == "__main__":
     for as_index in all_as:
         generate_interface_addresses(as_index.routers, connections_matrix)
 
+    print(connections_matrix)
+
     fichiers_config = []
     # Parcourir tous les AS et les routeurs dans chaque AS pour générer les fichiers de configuration pour chaque routeur
     for as_index in all_as:
@@ -59,8 +61,6 @@ if __name__ == "__main__":
             router_id = generate_router_id(router.name)
             config = []  # Créer une liste vide pour la configuration
             # Ajouter successivement les configurations de l'en-tête, loopback, interfaces, BGP et de fin
-            print("OOOOOOOOOOOOOOOOOOOO")
-            print(router.router_type)
             config.extend(config_head(router.name, router.router_type, router.vrf))
             config.extend(config_loopback(router_loopback, as_index.protocol))
             config.extend(config_interface(router.interfaces, as_index.protocol))
@@ -69,12 +69,9 @@ if __name__ == "__main__":
             
             # Écrire la configuration dans un fichier
             with open(f"i{router.name[1:]}_startup-config.cfg", 'w') as file:
-                print(config)
-                print("ok")
                 file.write('\n'.join(config))  # Écrire le contenu de la configuration
                 source_file.append(f"i{router.name[1:]}_startup-config.cfg")  # Ajouter le nom du fichier à la liste source_file
                 fichiers_config.append(f"i{router.name[1:]}_startup-config.cfg")
-                print("ok")
     
     for i in range(len(fichiers_config)):
         drag_file(i, fichiers_config)
