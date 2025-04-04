@@ -45,9 +45,9 @@ if __name__ == "__main__":
 
     # Parcourir tous les AS et les routeurs dans chaque AS pour générer les adresses des interfaces pour chaque routeur
     for as_index in all_as:
-        generate_interface_addresses(as_index.routers, connections_matrix)
+        generate_interface_addresses(as_index, connections_matrix)
 
-    print(connections_matrix)
+    # print(f"    connections_matrix : {connections_matrix}")
 
     fichiers_config = []
     # Parcourir tous les AS et les routeurs dans chaque AS pour générer les fichiers de configuration pour chaque routeur

@@ -90,21 +90,21 @@ def generate_connections_matrix(routers, AS):
 # Génération de l'adresse loopback pour un routeur
 def generate_loopback(name, loopback_range):
     router_number = int(name[1:])  # Récupère le numéro du routeur
-    return f"{loopback_range[:-4]}{router_number}"  # Formate l'adresse loopback
+    return f"{loopback_range[:-17]}{router_number}"  # Formate l'adresse loopback
 
 # Génération des adresses IPv4 pour les interfaces
-def generate_interface_addresses(routers, connections_matrix):
-    ip_range = "130.124.1.0/24"
+def generate_interface_addresses(as_info, connections_matrix):
+    ip_range = as_info.ip_range
     subnet = 0
     for lien in connections_matrix:
         i = subnet
         for router in lien[0]:
-            for r in routers:
+            for r in as_info.routers:
                 if router == int(r.name[1:]):
                     for interface in r.interfaces:
                         if interface['neighbor'] != "None":
                             ip = subnet+1+i
-                            ipv4_address = f"{ip_range[:-4]}{ip}"
+                            ipv4_address = f"{ip_range[:-17]}{ip}"
                             interface['ipv4_address'] = ipv4_address
                             print(f"{r.name}{interface} --> {ipv4_address}")
             i += 1
