@@ -72,14 +72,14 @@ def config_interface(interfaces, protocol,router_type):
             config.append(f" vrf forwarding {interface["vrf"]}")
         
         if interface['neighbor'] != "None":
-            if interface['name'] == "FastEthernet0/0":
-                config.append(" duplex full")
-            else:
-                config.append(" negotiation auto")
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
             if protocol == "OSPF" and interface["vrf"] == [] and  router_type != "CE":
                 config.append(f" ip ospf 2 area 0")
+            if interface['name'] == "FastEthernet0/0":
+                config.append(" duplex full")
+            else:
+                config.append(" negotiation auto")
             if router_type == 'P' or 'PE':
                 if interface["vrf"] == []:
                     config.append(" mpls ip")
@@ -93,16 +93,15 @@ def config_interface(interfaces, protocol,router_type):
 # Configure BGP Neighbor
 def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict, router_type):
     config = []
-    if router_type != "CE":
+    current_as = routers_dict[router.name]['AS']
+    if router_type == "PE":
         config.append("router ospf 1")
         config.append(f" router-id {router_id} \n!")
+        config.append(f"router bgp {current_as}")
+        config.append(" bgp log-neighbor-changes")
     else :
         config.append("router ospf 2")
         config.append(f" router-id {router_id} \n!")
-    # Configurer les voisins BGP
-    current_as = routers_dict[router.name]['AS']
-    config.append(f"router bgp {current_as}")
-    config.append(" bgp log-neighbor-changes")
 
     if router_type == "PE":
         # On cherche tous les PE du réseau et on met leur addresse loopback en voisin BGP
