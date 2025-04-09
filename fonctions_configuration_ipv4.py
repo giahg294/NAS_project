@@ -75,6 +75,7 @@ def config_interface(interfaces, protocol,router_type):
                 
                 if interface["vrf"] != []:
                     config.append(f" vrf forwarding {interface["vrf"]}")
+                else:    
                     config.append(f" ip {protocol} area 0")
             
             if interface['name'] == "FastEthernet0/0":
