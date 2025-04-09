@@ -2,7 +2,7 @@ from address_allocator import *
 import ipaddress
 
 # Configurer l'en-tête du fichier
-def config_head(name, router_type, clients, as_number): #ATTENTION : J'AI RAJOUTE L'ARGUMENT CLIENTS A CETTE FONCTION, C'EST LA LISTE DES CLIENTS CONNECTES A UN PE
+def config_head(name, router_type, clients, as_number):
     config = [
         "!\r"*3,
         "!",
@@ -52,9 +52,9 @@ def config_loopback(ip_loopback, protocol, router_type):
     config.append("interface Loopback0")
     config.append(f" ip address {ip_loopback} 255.255.255.255")
     if router_type != "CE":
-        config.append(f" ip ospf 1 area 0")
+        config.append(f" ip {protocol} area 0")
     else :
-        config.append(f" ip ospf 2 area 0")
+        config.append(f" ip {protocol} area 0")
     config.append("!")
     return config
 
@@ -69,15 +69,14 @@ def config_interface(interfaces, protocol,router_type):
             config.append(" shutdown")
             config.append(" negotiation auto")
         
-        if interface["vrf"] != []:
-            config.append(f" vrf forwarding {interface["vrf"]}")
-        
         if interface['neighbor'] != "None":
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
                 
-                # config OSPF à optimiser
-                config.append(f" ip ospf 2 area 0")
+                if interface["vrf"] != []:
+                    config.append(f" vrf forwarding {interface["vrf"]}")
+                else:    
+                    config.append(f" ip {protocol} area 0")
             
             if interface['name'] == "FastEthernet0/0":
                 config.append(" duplex full")
@@ -94,25 +93,28 @@ def config_interface(interfaces, protocol,router_type):
 
 
 # Configure BGP Neighbor
-def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
+def config_bgp(protocol, all_routers, router, router_id, routers_dict):
     config = []
     current_as = routers_dict[router.name]['AS']
     if router.router_type == "PE":
-        config.append("router ospf 1")
+        config.append(f"router {protocol}")
         config.append(f" router-id {router_id} \n!")
         config.append(f"router bgp {current_as}")
         config.append(" bgp log-neighbor-changes")
     elif router.router_type == "CE" :
-        config.append("router ospf 2")
+        config.append(f"router {protocol}")
         config.append(f" router-id {router_id} \n!")
         config.append(f"router bgp {current_as}")
         config.append(f" bgp router-id  {router_id}")
         config.append(" bgp log-neighbor-changes")
     elif router.router_type == "C" :
-        config.append("router ospf 2")
+        config.append(f"router {protocol}")
         config.append(f" router-id {router_id} \n!")
         config.append(f"router bgp {current_as}")
         config.append(" bgp log-neighbor-changes")
+    elif router.router_type == "P" :
+        config.append(f"router {protocol}")
+        config.append(f" router-id {router_id} \n!")
 
 
 
@@ -134,13 +136,12 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
                 config.append(f"  network {neighbor_ip} mask 255.255.255.255")
 
         # soi-meme 180.124.0.1 mask 255.255.255.255
-        config.append(f"  network {loopback_dict[router.name]} mask 255.255.255.255")   
+        config.append(f"  network {routers_dict[router.name]["loopback"]} 255.255.255.255")   
 
         # ipv4
         for router1 in routers_dict:
             if routers_dict[router1]['AS'] == current_as and router1 == router.name:
                 for interface in router.interfaces :
-                    print(f"AAAARRRRGGG{interface}")
                     if 'ipv4_address' in interface.keys():
                         # print('OKOKOK')
                         config.append(f"  network {interface['ipv4_address']} mask 255.255.255.252")
@@ -162,7 +163,7 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
         for neighbor_PE in all_routers:
             if neighbor_PE.router_type == "PE" and neighbor_PE.name != router.name:
                 neighbor_name = neighbor_PE.name
-                neighbor_ip = loopback_dict[neighbor_name]
+                neighbor_ip = routers_dict[neighbor_name]["loopback"]
                 config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
                 config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n !")
                 config.append("address-family vpn4")

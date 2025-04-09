@@ -31,52 +31,33 @@ if __name__ == "__main__":
         for router in as_index.routers:  
             as_mapping[router.name] = as_index.number  # Mapper le nom du routeur au numéro de l'AS auquel il appartient
 
-   
 
     # Créer une liste contenant tous les routeurs
     all_routers = [router for as_index in all_as for router in as_index.routers]
     connections_matrix = generate_connections_matrix(all_routers, as_mapping)
-    # print(connections_matrix)
     routers_info = generate_routers_dict(all_as, connections_matrix)
-    # print(routers_info)
 
     # Définir une liste vide pour stocker tous les fichiers source générés
     source_file = []
-    
-    
 
     # Parcourir tous les AS et les routeurs dans chaque AS pour générer les adresses des interfaces pour chaque routeur
     for as_index in all_as:
         generate_interface_addresses(as_index, connections_matrix)
-
-    # print(f"    connections_matrix : {connections_matrix}")
-
-    loopback_dict = {}
-    for as_index in all_as:
-        for router in as_index.routers:
-            router_loopback = generate_loopback(router.name, as_index.loopback_range)
-            loopback_dict[router.name] = router_loopback
 
     fichiers_config = []
     # Parcourir tous les AS et les routeurs dans chaque AS pour générer les fichiers de configuration pour chaque routeur
     for as_index in all_as:
         for router in as_index.routers:
             # Générer l'adresse loopback du routeur
-            router_loopback = loopback_dict[router.name]
-            
             # Générer l'ID du routeur
             router_id = generate_router_id(router.name)
             config = []  # Créer une liste vide pour la configuration
             # Ajouter successivement les configurations de l'en-tête, loopback, interfaces, BGP et de fin
 
-            #test
-            # print(f"router.interfaces : {router.interfaces}")
-
-
             config.extend(config_head(router.name, router.router_type, router.vrf, as_index.number))
-            config.extend(config_loopback(router_loopback, as_index.protocol, router.router_type))
+            config.extend(config_loopback(routers_info[router.name]["loopback"], as_index.protocol, router.router_type))
             config.extend(config_interface(router.interfaces, as_index.protocol, router.router_type))
-            config.extend(config_bgp(loopback_dict, all_routers, router, router_id, routers_info))
+            config.extend(config_bgp(as_index.protocol, all_routers, router, router_id, routers_info))
             config.extend(config_end(as_index.protocol, router_id))
             
             # Écrire la configuration dans un fichier
