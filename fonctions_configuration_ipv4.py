@@ -122,7 +122,7 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
             config.append(f"  network {neighbor_ip} mask 255.255.255.255")
 
     # soi-meme 180.124.0.1 mask 255.255.255.255
-    config.append(f"  network {ip_loopback} 255.255.255.255")   
+    config.append(f"  network {loopback_dict[router.name]} 255.255.255.255")   
 
     # ipv4
     for router1 in routers_dict:
