@@ -21,9 +21,9 @@ def config_head(name, router_type, clients, as_number): #ATTENTION : J'AI RAJOUT
         for client in clients:
             config.append(f"vrf definition {client}")
             if router_type == "PE":
-                config.append(f" rd {as_number}:{as_number}")
-                config.append(f" route-target export {as_number}:{as_number}")
-                config.append(f" route-target import {as_number}:{as_number}")
+                config.append(f" rd {as_number}:{client[7:]}00")
+                config.append(f" route-target export {as_number}:{client[7:]}000")
+                config.append(f" route-target import {as_number}:{client[7:]}000")
             config.append(" !\n address-family ipv4\n exit-address-family\n!")
             
     suite_config = ["no aaa new-model",
@@ -76,33 +76,43 @@ def config_interface(interfaces, protocol):
             if protocol == "OSPF" and interface["vrf"] == []:
                 config.append(f" ip ospf 1 area 0")
         config.append("!")
-            
     
     return config
 
+def config_ospf(router_id):
+    config = []
+    config.append("router ospf 1")
+    config.append(f" router-id {router_id} \n!")
+    return config
 
 # Configure BGP Neighbor
 def config_bgp(router, router_id, routers_dict, router_type):
     config = []
-    if router_type != "CE":
-        config.append("router ospf 1")
-        config.append(f" router-id {router_id} \n!")
-    # Configurer les voisins BGP
-    current_as = routers_dict[router.name]['AS']
-    config.append(f"router bgp {current_as}")
-    config.append(f" bgp router-id {router_id}")
-    config.append(" bgp log-neighbor-changes")
+    if router_type == "PE" or "CE" or "C":
+        # Configurer les voisins BGP
+        current_as = routers_dict[router.name]['AS']
+        config.append(f"router bgp {current_as}")
+        config.append(f" bgp router-id {router_id}")
+        config.append(" bgp log-neighbor-changes")
 
-    for neighbor in routers_dict:
-        if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
-            neighbor_ip = routers_dict[neighbor]['loopback']
-            config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-            config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
+        for neighbor in routers_dict:
+            if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
+                neighbor_ip = routers_dict[neighbor]['loopback']
+                config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
+                config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
 
-    config.append("!")
-    config.append(" address-family ipv4")
-    config.append(" exit-address-family")
-    config.append("!")
+        for neighbor in routers_dict:
+            config.append("!")
+            config.append(" address-family ipv4")
+            config.append(f" neighbor {neighbor_ip} acitvate")
+            
+            if router_type == "CE" and routers_dict[neighbor]['AS'] == 10:
+                neighbor_ip = routers_dict[neighbor].interface['ipv4']
+                network_ip = routers_dict[neighbor]['ip_range']
+                config.append(f"  neighbor {neighbor_ip} allowas-in")
+            config.append(f"  network {network_ip} mask 255.255.255.252")
+            config.append(" exit-address-family")
+            config.append("!")
 
     return config
 
