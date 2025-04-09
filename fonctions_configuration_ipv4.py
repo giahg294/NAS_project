@@ -91,7 +91,7 @@ def config_interface(interfaces, protocol,router_type):
 
 
 # Configure BGP Neighbor
-def config_bgp(all_routeurs, router, router_id, routers_dict, router_type):
+def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict, router_type):
     config = []
     if router_type != "CE":
         config.append("router ospf 1")
@@ -103,13 +103,13 @@ def config_bgp(all_routeurs, router, router_id, routers_dict, router_type):
     current_as = routers_dict[router.name]['AS']
     config.append(f"router bgp {current_as}")
     config.append(" bgp log-neighbor-changes")
-    #print(f"AAAAA{router}")
-    #if router_type == "PE":
+
     if router_type == "PE":
         # On cherche tous les PE du réseau et on met leur addresse loopback en voisin BGP
-        for neighbor_PE in all_routeurs:
-            if neighbor_PE.router_type == "PE":
-                neighbor_ip = neighbor_PE.interfaces[0]['ipv4_address']
+        for neighbor_PE in all_routers:
+            if neighbor_PE.router_type == "PE" and neighbor_PE.name != router.name:
+                neighbor_name = neighbor_PE.name
+                neighbor_ip = loopback_dict[neighbor_name]
                 config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
                 config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
                 config.append("address-family vpn4")
