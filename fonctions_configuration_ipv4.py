@@ -62,13 +62,15 @@ def config_interface(interfaces, protocol,router_type):
     config = []
     for interface in interfaces:
         config.append(f"interface {interface['name']}")
+        
         if interface['neighbor'] == "None":
             config.append(" no ip address")
             config.append(" shutdown")
             config.append(" negotiation auto")
+        
         if interface["vrf"] != []:
             config.append(f" vrf forwarding {interface["vrf"]}")
-        #Ligne à optimiser !
+        
         if interface['neighbor'] != "None":
             if interface['name'] == "FastEthernet0/0":
                 config.append(" duplex full")
@@ -81,6 +83,7 @@ def config_interface(interfaces, protocol,router_type):
             if router_type == 'P' or 'PE':
                 if interface["vrf"] == []:
                     config.append(" mpls ip")
+        
         config.append("!")
             
     
