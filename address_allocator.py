@@ -93,8 +93,6 @@ def generate_loopback(name, loopback_range):
 
 # Génération des adresses IPv4 pour les interfaces
 def generate_interface_addresses(as_info, connections_matrix):
-    # print(f"    as_info : {as_info}")
-    # print(f"    connections_matrix : {connections_matrix}")
     ip_range = as_info.ip_range
     i = 0
     all_lien_as = []
@@ -115,15 +113,14 @@ def generate_interface_addresses(as_info, connections_matrix):
                                 ip = i
                                 ipv4_address = f"{ip_range[:-17]}{ip}"
                                 interface['ipv4_address'] = ipv4_address
-                                # print(f"{r.name}{interface} --> {ipv4_address}")
                                 
                             else:
                                 ip = i+3
                                 ipv4_address = f"{ip_range[:-17]}{ip}"
                                 interface['ipv4_address'] = ipv4_address
-                                # print(f"{r.name}{interface} --> {ipv4_address}")
                                 i = ip
             traites.append(router)
+
 
 # Génération de l'ID routeur (Router ID)
 def generate_router_id(name):
