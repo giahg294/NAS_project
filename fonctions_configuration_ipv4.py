@@ -18,14 +18,15 @@ def config_head(name, router_type, clients, as_number): #ATTENTION : J'AI RAJOUT
     
     
     if router_type != "P":
-        for client in clients:
-            config.append(f"vrf definition {client}")
-            if router_type == "PE":
-                config.append(f" rd {as_number}:{client[7:]}00")
-                config.append(f" route-target export {as_number}:{client[7:]}000")
-                config.append(f" route-target import {as_number}:{client[7:]}000")
-            config.append(" !\n address-family ipv4\n exit-address-family\n!")
-            
+        if clients != []:
+            for client in clients.keys():
+                config.append(f"vrf definition {client}")
+                if router_type == "PE":
+                    config.append(f" rd {as_number}:{clients[client][0]}")
+                    config.append(f" route-target export {as_number}:{clients[client][1]}")
+                    config.append(f" route-target import {as_number}:{clients[client][1]}")
+                config.append(" !\n address-family ipv4\n exit-address-family\n!")
+                
     suite_config = ["no aaa new-model",
         "no ip icmp rate-limit unreachable",
         "ip cef",
@@ -110,7 +111,7 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict, rout
                 neighbor_name = neighbor_PE.name
                 neighbor_ip = loopback_dict[neighbor_name]
                 config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-                config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
+                config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n !")
                 config.append("address-family vpn4")
                 config.append(f" neighbor {neighbor_ip} activate")
                 config.append(f" neighbor {neighbor_ip} send-community extended")
