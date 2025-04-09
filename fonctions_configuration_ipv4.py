@@ -106,19 +106,16 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
         config.append("router ospf 2")
         config.append(f" router-id {router_id} \n!")
 
-    for neighbor in routers_dict:
-        if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
-            neighbor_ip = routers_dict[neighbor]['loopback']
-            config.append("address-family ipv4 vrf NomClientàremplacer")
-            config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-            config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
-
-    config.append("!")
-    config.append(" address-family ipv4")
-
 
     if router.router_type == "CE":
-
+        for neighbor in routers_dict:
+            if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
+                neighbor_ip = routers_dict[neighbor]['loopback']
+                config.append("address-family ipv4 vrf NomClientàremplacer")
+                config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
+                config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
+        config.append("!")
+        config.append(" address-family ipv4")
         # neighbor 160.124.0.1 mask 255.255.255.255
         for neighbor in routers_dict:
             if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
