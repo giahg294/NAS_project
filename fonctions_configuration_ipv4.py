@@ -21,9 +21,9 @@ def config_head(name, router_type, clients, as_number): #ATTENTION : J'AI RAJOUT
         for client in clients:
             config.append(f"vrf definition {client}")
             if router_type == "PE":
-                config.append(f" rd {as_number}:{as_number}")
-                config.append(f" route-target export {as_number}:{as_number}")
-                config.append(f" route-target import {as_number}:{as_number}")
+                config.append(f" rd {as_number}:{client[7:]}00")
+                config.append(f" route-target export {as_number}:{client[7:]}000")
+                config.append(f" route-target import {as_number}:{client[7:]}000")
             config.append(" !\n address-family ipv4\n exit-address-family\n!")
             
     suite_config = ["no aaa new-model",
