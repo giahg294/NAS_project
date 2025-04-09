@@ -2,23 +2,32 @@
 
 ## Description du Projet NAS
 
-Ce projet a pour objectif d’automatiser la configuration d’un réseau MPLS avec services **BGP/MPLS VPN** pour plusieurs clients, dans un environnement **GNS3**.  
-Nous utilisons les protocols et services suivants :
-- **OSPFv2** pour le routage IGP dans le cœur de réseau
-- **LDP** pour la distribution des labels MPLS
-- **BGP (MP-BGP)** pour l’échange de routes VPN entre routeurs PE
-- Le tout en **IPv4**
+Ce projet vise à automatiser la configuration d’un réseau **IPv4 BGP/MPLS VPN** dans **GNS3**, en s’appuyant sur un fichier d’intention décrivant les AS, routeurs, interfaces, protocoles et VRFs.  
+Le réseau met en place une architecture **provider / clients** avec **2 clients VPN distincts**, isolés via VRF.
 
-Ici le réseau supporte 2 clients VPN distincts, isolés grâce à l'utilisation de **VRF**, **Route Distinguisher** et **Route Target**.
+Les services réseau sont configurés automatiquement à l’aide de :
+- **OSPFv2** pour le routage IGP interne,
+- **LDP** pour activer le transport MPLS,
+- **MP-BGP (vpnv4)** entre routeurs PE.
 
 ---
 
 ## Structure du projet
 
-- Fichier d'intention `4routeurs.json`  
-- `main.py`  
+- `4routeurs.json` 
+Fichier d’intention décrivant la topologie réseau.   
+Pour chaque AS : les routeurs, leur rôle (PE, P, CE, C), les vrfs, les interfaces, les voisins et les plages d’adresses IPv4 (interfaces et loopbacks).  
+Pour l’environnement inter-AS : les connexions entre routeurs de différents AS et les plages d’adresses IPv4 utilisées.
+
+- `main.py` 
+Génère automatiquement la configuration IPv4 complète pour chaque routeur :  
+Entête de config, interfaces, loopbacks  
+OSPF, LDP, MP-BGP, VRFs clients  
+Fichier prêt à être injecté dans GNS3  
 - `drag_n_drop_bot.py`  
+Script Python qui déplace automatiquement les fichiers de configuration dans les bons répertoires GNS3 (via `project-files/dynamips/...`), en fonction d’un mapping des routeurs.
 - `fonctions_configuration_ipv4.py`
+Script Bash qui cherche et place les fichiers `iX_startup-config.cfg` dans les bons répertoires. À utiliser après génération des configs pour les injecter dans GNS3.
 
 ---
 
