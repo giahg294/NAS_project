@@ -74,8 +74,10 @@ def config_interface(interfaces, protocol,router_type):
         if interface['neighbor'] != "None":
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
-            if protocol == "OSPF" and interface["vrf"] == [] and  router_type != "CE":
+                
+                # config OSPF à optimiser
                 config.append(f" ip ospf 2 area 0")
+            
             if interface['name'] == "FastEthernet0/0":
                 config.append(" duplex full")
             else:
