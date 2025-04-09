@@ -48,12 +48,19 @@ if __name__ == "__main__":
 
     # print(f"    connections_matrix : {connections_matrix}")
 
+    loopback_dict = {}
+    for as_index in all_as:
+        for router in as_index.routers:
+            router_loopback = generate_loopback(router.name, as_index.loopback_range)
+            loopback_dict[router.name] = router_loopback
+    print(loopback_dict)
+
     fichiers_config = []
     # Parcourir tous les AS et les routeurs dans chaque AS pour générer les fichiers de configuration pour chaque routeur
     for as_index in all_as:
         for router in as_index.routers:
             # Générer l'adresse loopback du routeur
-            router_loopback = generate_loopback(router.name, as_index.loopback_range)
+            router_loopback = loop
             
             # Générer l'ID du routeur
             router_id = generate_router_id(router.name)
