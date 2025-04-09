@@ -77,14 +77,10 @@ def config_interface(interfaces, protocol,router_type):
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
             if protocol == "OSPF" and interface["vrf"] == [] and  router_type != "CE":
-                config.append(f" ip ospf 1 area 0")
+                config.append(f" ip ospf 2 area 0")
             if router_type == 'P' or 'PE':
                 if interface["vrf"] == []:
                     config.append(" mpls ip")
-            elif protocol == "OSPF" and interface["vrf"] == [] and  router_type == "CE":
-                config.append(f" ip ospf 2 area 0")
-            if interface['name'] != "FastEthernet0/0":
-                config.append(" negotiation auto")
         config.append("!")
             
     
