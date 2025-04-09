@@ -119,13 +119,15 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict):
 
 
     if router.router_type == "CE":
+        print(routers_dict)
         for neighbor in routers_dict:
+            print(neighbor)
             if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
                 neighbor_ip = routers_dict[neighbor]['loopback']
 
                 config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-                if neighbor.router_type == "PE" :
-                    config.append(f" neighbor {neighbor_ip} update-source Loopback0")
+                # if routers_dict[neighbor].router_type == "PE" :
+                config.append(f" neighbor {neighbor_ip} update-source Loopback0")
         
         config.append("!")
         config.append(" address-family ipv4")
