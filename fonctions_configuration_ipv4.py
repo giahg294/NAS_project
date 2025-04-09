@@ -132,8 +132,8 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
         for router1 in routers_dict:
             if routers_dict[router1]['AS'] == current_as and router1 == router.name:
                 for interface in router.interfaces :
-                    # print(interface['ipv4_address'])
-                    if interface['ipv4_address']!= "None" :
+                    print(f"AAAARRRRGGG{interface}")
+                    if 'ipv4_address' in interface.keys():
                         # print('OKOKOK')
                         config.append(f"  network {interface['ipv4_address']} mask 255.255.255.252")
                         # print(config)
@@ -162,16 +162,16 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
                 config.append(f" neighbor {neighbor_ip} send-community extended")
                 config.append("exit-address-family \n!")
     
-    for interface in router.interfaces:
-        if interface["vrf"] != []:
-            neighbor_name = interface["neighbor"]
-            as_vrf_neighbor = routers_dict[neighbor_name]['AS']
-            vrf_name = interface["vrf"]
-            vrf_ip = interface["ipv4_address"]
-            config.append(f"address-family ipv4 vrf {vrf_name}")
-            config.append(f" neighbor {vrf_ip} remote-as {as_vrf_neighbor}")
-            config.append(f" neighbor {vrf_ip} activate")
-            config.append("exit-address-family \n!")
+        for interface in router.interfaces:
+            if interface["vrf"] != []:
+                neighbor_name = interface["neighbor"]
+                as_vrf_neighbor = routers_dict[neighbor_name]['AS']
+                vrf_name = interface["vrf"]
+                vrf_ip = interface["ipv4_address"]
+                config.append(f"address-family ipv4 vrf {vrf_name}")
+                config.append(f" neighbor {vrf_ip} remote-as {as_vrf_neighbor}")
+                config.append(f" neighbor {vrf_ip} activate")
+                config.append("exit-address-family \n!")
 
     return config
 

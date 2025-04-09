@@ -56,7 +56,6 @@ if __name__ == "__main__":
         for router in as_index.routers:
             router_loopback = generate_loopback(router.name, as_index.loopback_range)
             loopback_dict[router.name] = router_loopback
-    print(loopback_dict)
 
     fichiers_config = []
     # Parcourir tous les AS et les routeurs dans chaque AS pour générer les fichiers de configuration pour chaque routeur
