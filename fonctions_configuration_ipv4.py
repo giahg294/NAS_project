@@ -88,9 +88,10 @@ def config_interface(interfaces, protocol, router_type):
 
 
 # Configure BGP Neighbor
-def config_bgp(ip_loopback, router, router_id, routers_dict, router_type):
+def config_bgp(router, router_id, routers_dict, ip_loopback):
     config = []
-    if router_type != "CE":
+    # print(router.interfaces)
+    if router.router_type != "CE":
         config.append("router ospf 1")
         config.append(f" router-id {router_id} \n!")
     else :
@@ -125,7 +126,13 @@ def config_bgp(ip_loopback, router, router_id, routers_dict, router_type):
     # ipv4
     for router1 in routers_dict:
         if routers_dict[router1]['AS'] == current_as and router1 == router.name:
-            config.append(f"  network {routers_dict[router1].interface['ipv4']} mask 255.255.255.252")
+            for interface in router.interfaces :
+                # print(interface['ipv4_address'])
+                if interface['ipv4_address']!= "None" :
+                    # print('OKOKOK')
+                    config.append(f"  network {interface['ipv4_address']} mask 255.255.255.252")
+                    # print(config)
+                    # print(f"  network {interface['ipv4_address']} mask 255.255.255.252")
 
     # neighbor:  activate & next-hop-self
     for neighbor in routers_dict:
