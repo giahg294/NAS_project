@@ -115,35 +115,39 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
     config.append("!")
     config.append(" address-family ipv4")
 
-    # neighbor 160.124.0.1 mask 255.255.255.255
-    for neighbor in routers_dict:
-        if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
-            neighbor_ip = routers_dict[neighbor]['loopback']
-            config.append(f"  network {neighbor_ip} mask 255.255.255.255")
 
-    # soi-meme 180.124.0.1 mask 255.255.255.255
-    config.append(f"  network {loopback_dict[router.name]} 255.255.255.255")   
+    if router.router_type == "CE":
 
-    # ipv4
-    for router1 in routers_dict:
-        if routers_dict[router1]['AS'] == current_as and router1 == router.name:
-            for interface in router.interfaces :
-                # print(interface['ipv4_address'])
-                if interface['ipv4_address']!= "None" :
-                    # print('OKOKOK')
-                    config.append(f"  network {interface['ipv4_address']} mask 255.255.255.252")
-                    # print(config)
-                    # print(f"  network {interface['ipv4_address']} mask 255.255.255.252")
+        # neighbor 160.124.0.1 mask 255.255.255.255
+        for neighbor in routers_dict:
+            if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
+                neighbor_ip = routers_dict[neighbor]['loopback']
+                config.append(f"  network {neighbor_ip} mask 255.255.255.255")
 
-    # neighbor:  activate & next-hop-self
-    for neighbor in routers_dict:
-        if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
-            neighbor_ip = routers_dict[neighbor]['loopback']
-            config.append(f"  neighbor {neighbor_ip} avtivate")     
-            config.append(f"  neighbor {neighbor_ip} next-hop-self")     
+        # soi-meme 180.124.0.1 mask 255.255.255.255
+        config.append(f"  network {loopback_dict[router.name]} 255.255.255.255")   
 
-    config.append(" exit-address-family")
-    config.append("!")
+        # ipv4
+        for router1 in routers_dict:
+            if routers_dict[router1]['AS'] == current_as and router1 == router.name:
+                for interface in router.interfaces :
+                    # print(interface['ipv4_address'])
+                    if interface['ipv4_address']!= "None" :
+                        # print('OKOKOK')
+                        config.append(f"  network {interface['ipv4_address']} mask 255.255.255.252")
+                        # print(config)
+                        # print(f"  network {interface['ipv4_address']} mask 255.255.255.252")
+
+        # neighbor:  activate & next-hop-self
+        for neighbor in routers_dict:
+            if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
+                neighbor_ip = routers_dict[neighbor]['loopback']
+                config.append(f"  neighbor {neighbor_ip} avtivate")     
+                config.append(f"  neighbor {neighbor_ip} next-hop-self")     
+
+        config.append(" exit-address-family")
+        config.append("!")
+
     if router.router_type == "PE":
         # On cherche tous les PE du réseau et on met leur addresse loopback en voisin BGP
         for neighbor_PE in all_routers:
