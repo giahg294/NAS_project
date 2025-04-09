@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Projet NAS – BGP/MPLS VPN Automation
 
 ## Description du Projet NAS
@@ -62,6 +61,4 @@ python3 main.py
 Hoang Gia, Xu Yafei, Collet Marine, El Moukri Yassmine, Muccini Bianca – Étudiants 5TC, INSA Lyon  
 Projet réalisé dans le cadre du module NAS, 2025  
 Encadrants : Pierre François et Victor Rébeq
-=======
-# NAS_project
->>>>>>> a8ac7ecede4078a5cb4be12ac7c8c2b725694cd7
+
