@@ -110,7 +110,7 @@ def config_bgp(router, router_id, routers_dict, router_type):
                 neighbor_ip = routers_dict[neighbor].interface['ipv4']
                 network_ip = routers_dict[neighbor]['ip_range']
                 config.append(f"  neighbor {neighbor_ip} allowas-in")
-            config.append(f"  network {network_ip} mask 255.255.255.252")
+                config.append(f"  network {network_ip} mask 255.255.255.252")
             config.append(" exit-address-family")
             config.append("!")
 
