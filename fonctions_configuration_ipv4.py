@@ -69,15 +69,13 @@ def config_interface(interfaces, protocol,router_type):
             config.append(" shutdown")
             config.append(" negotiation auto")
         
-        if interface["vrf"] != []:
-            config.append(f" vrf forwarding {interface["vrf"]}")
-        
         if interface['neighbor'] != "None":
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
                 
-                # config OSPF à optimiser
-                config.append(f" ip {protocol} area 0")
+                if interface["vrf"] != []:
+                    config.append(f" vrf forwarding {interface["vrf"]}")
+                    config.append(f" ip {protocol} area 0")
             
             if interface['name'] == "FastEthernet0/0":
                 config.append(" duplex full")
