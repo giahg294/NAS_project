@@ -55,27 +55,29 @@ def config_loopback(ip_loopback, protocol):
     return config
 
 # Configure each interface
-def config_interface(interfaces, protocol):
+def config_interface(interfaces, protocol,router_type):
     config = []
     for interface in interfaces:
         config.append(f"interface {interface['name']}")
         if interface['neighbor'] == "None":
             config.append(" no ip address")
             config.append(" shutdown")
+            config.append(" negotiation auto")
         if interface["vrf"] != []:
             config.append(f" vrf forwarding {interface["vrf"]}")
         #Ligne à optimiser !
-        if interface['neighbor'] != "None" and interface["vrf"] == []:
-            config.append(" mpls ip")
-        else:
+        if interface['neighbor'] != "None":
             if interface['name'] == "FastEthernet0/0":
                 config.append(" duplex full")
+            else:
+                config.append(" negotiation auto")
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
             if protocol == "OSPF" and interface["vrf"] == []:
                 config.append(f" ip ospf 1 area 0")
-            if interface['name'] != "FastEthernet0/0":
-                config.append(" negotiation auto")
+            if router_type == 'P' or 'PE':
+                if interface["vrf"] == []:
+                    config.append(" mpls ip")
         config.append("!")
             
     
