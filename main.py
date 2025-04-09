@@ -61,7 +61,7 @@ if __name__ == "__main__":
     for as_index in all_as:
         for router in as_index.routers:
             # Générer l'adresse loopback du routeur
-            router_loopback = loop
+            router_loopback = loopback_dict[router.name]
             
             # Générer l'ID du routeur
             router_id = generate_router_id(router.name)
