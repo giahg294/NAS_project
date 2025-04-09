@@ -5,7 +5,7 @@
             "number": "10",
             "IP_range": "130.124.1.0 255.255.255.252",
             "loopback_range": "130.124.0.0 255.255.255.255",
-            "protocol": "OSPF",
+            "protocol": "ospf 1",
             "relation" : "provider",
             "routers": [
                  {
@@ -138,7 +138,7 @@
             "number": "20",
             "IP_range": "198.172.1.0 255.255.255.240",
             "loopback_range": "160.124.0.0 255.255.255.255",
-            "protocol": "bgp",
+            "protocol": "ospf 2",
             "relation" : "Client1",
             "routers": [
                 {
@@ -271,7 +271,7 @@
             "number": "30",
             "IP_range": "198.172.2.0 255.255.255.240",
             "loopback_range": "180.124.0.0 255.255.255.255",
-            "protocol": "bgp",
+            "protocol": "ospf 3",
             "relation" : "Client2",
             "routers": [
                 {
