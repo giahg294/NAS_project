@@ -2,7 +2,7 @@ from address_allocator import *
 import ipaddress
 
 # Configurer l'en-tête du fichier
-def config_head(name, router_type, clients, as_number): #ATTENTION : J'AI RAJOUTE L'ARGUMENT CLIENTS A CETTE FONCTION, C'EST LA LISTE DES CLIENTS CONNECTES A UN PE
+def config_head(name, router_type, clients, as_number):
     config = [
         "!\r"*3,
         "!",
@@ -129,7 +129,6 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict):
         for router1 in routers_dict:
             if routers_dict[router1]['AS'] == current_as and router1 == router.name:
                 for interface in router.interfaces :
-                    # print(f"AAAARRRRGGG{interface}")
                     if 'ipv4_address' in interface.keys():
                         # print('OKOKOK')
                         config.append(f"  network {interface['ipv4_address']} mask 255.255.255.252")
