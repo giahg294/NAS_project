@@ -102,28 +102,39 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
         config.append(f" router-id {router_id} \n!")
         config.append(f"router bgp {current_as}")
         config.append(" bgp log-neighbor-changes")
-    else :
+    elif router.router_type == "CE" :
         config.append("router ospf 2")
         config.append(f" router-id {router_id} \n!")
+        config.append(f"router bgp {current_as}")
+        config.append(f" bgp router-id  {router_id}")
+        config.append(" bgp log-neighbor-changes")
+    elif router.router_type == "C" :
+        config.append("router ospf 2")
+        config.append(f" router-id {router_id} \n!")
+        config.append(f"router bgp {current_as}")
+        config.append(" bgp log-neighbor-changes")
+
 
 
     if router.router_type == "CE":
         for neighbor in routers_dict:
             if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
                 neighbor_ip = routers_dict[neighbor]['loopback']
-                config.append("address-family ipv4 vrf NomClientàremplacer")
+
                 config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-                config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
+                if neighbor.router_type == "PE" :
+                    config.append(f" neighbor {neighbor_ip} update-source Loopback0")
+        
         config.append("!")
         config.append(" address-family ipv4")
-        # neighbor 160.124.0.1 mask 255.255.255.255
+        # loopback de neighbor 160.124.0.1 mask 255.255.255.255
         for neighbor in routers_dict:
             if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
                 neighbor_ip = routers_dict[neighbor]['loopback']
                 config.append(f"  network {neighbor_ip} mask 255.255.255.255")
 
         # soi-meme 180.124.0.1 mask 255.255.255.255
-        config.append(f"  network {loopback_dict[router.name]} 255.255.255.255")   
+        config.append(f"  network {loopback_dict[router.name]} mask 255.255.255.255")   
 
         # ipv4
         for router1 in routers_dict:
