@@ -105,13 +105,27 @@ def config_bgp(all_routeurs, router, router_id, routers_dict, router_type):
     config.append(" bgp log-neighbor-changes")
     #print(f"AAAAA{router}")
     #if router_type == "PE":
-
-    for neighbor in routers_dict:
-        if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
-            neighbor_ip = routers_dict[neighbor]['loopback']
-            config.append("address-family ipv4 vrf NomClientàremplacer")
-            config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-            config.append(f" neighbor {neighbor_ip} update-source Loopback0")
+    if router_type == "PE":
+        # On cherche tous les PE du réseau et on met leur addresse loopback en voisin BGP
+        for neighbor_PE in all_routeurs:
+            if neighbor_PE.router_type == "PE":
+                neighbor_ip = neighbor_PE.interfaces[0]['ipv4_address']
+                config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
+                config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
+                config.append("address-family vpn4")
+                config.append(f" neighbor {neighbor_ip} activate")
+                config.append(f" neighbor {neighbor_ip} send-community extended")
+                config.append("exit-address-family \n!")
+    
+    for interface in router.interfaces:
+        if interface["vrf"] != []:
+            neighbor_name = interface["neighbor"]
+            as_vrf_neighbor = routers_dict[neighbor_name]['AS']
+            vrf_name = interface["vrf"]
+            vrf_ip = interface["ipv4_address"]
+            config.append(f"address-family ipv4 vrf {vrf_name}")
+            config.append(f" neighbor {vrf_ip} remote-as {as_vrf_neighbor}")
+            config.append(f" neighbor {vrf_ip} activate")
             config.append("exit-address-family \n!")
 
     return config
