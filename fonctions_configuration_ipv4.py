@@ -80,7 +80,7 @@ def config_interface(interfaces, protocol,router_type):
                 config.append(" duplex full")
             else:
                 config.append(" negotiation auto")
-            if router_type == 'P' or 'PE':
+            if router_type == 'P' or router_type == 'PE':
                 if interface["vrf"] == []:
                     config.append(" mpls ip")
         
