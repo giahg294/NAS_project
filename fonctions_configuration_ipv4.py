@@ -46,16 +46,19 @@ def config_head(name, router_type, clients, as_number): #ATTENTION : J'AI RAJOUT
 
 
 # Configure Loopback Interface
-def config_loopback(ip_loopback, protocol):
+def config_loopback(ip_loopback, protocol, router_type):
     config = []
     config.append("interface Loopback0")
     config.append(f" ip address {ip_loopback} 255.255.255.255")
-    config.append(f" ip ospf 1 area 0")
+    if router_type != "CE":
+        config.append(f" ip ospf 1 area 0")
+    else :
+        config.append(f" ip ospf 2 area 0")
     config.append("!")
     return config
 
 # Configure each interface
-def config_interface(interfaces, protocol):
+def config_interface(interfaces, protocol, router_type):
     config = []
     for interface in interfaces:
         config.append(f"interface {interface['name']}")
@@ -73,8 +76,10 @@ def config_interface(interfaces, protocol):
                 config.append(" negotiation auto")
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
-            if protocol == "OSPF" and interface["vrf"] == []:
+            if protocol == "OSPF" and interface["vrf"] == [] and  router_type != "CE":
                 config.append(f" ip ospf 1 area 0")
+            elif protocol == "OSPF" and interface["vrf"] == [] and  router_type == "CE":
+                config.append(f" ip ospf 2 area 0")
         config.append("!")
             
     
@@ -82,10 +87,13 @@ def config_interface(interfaces, protocol):
 
 
 # Configure BGP Neighbor
-def config_bgp(router, router_id, routers_dict, router_type):
+def config_bgp(ip_loopback, router, router_id, routers_dict, router_type):
     config = []
     if router_type != "CE":
         config.append("router ospf 1")
+        config.append(f" router-id {router_id} \n!")
+    else :
+        config.append("router ospf 2")
         config.append(f" router-id {router_id} \n!")
     # Configurer les voisins BGP
     current_as = routers_dict[router.name]['AS']
@@ -101,6 +109,17 @@ def config_bgp(router, router_id, routers_dict, router_type):
 
     config.append("!")
     config.append(" address-family ipv4")
+
+    # neighbor 160.124.0.1 mask 255.255.255.255
+    for neighbor in routers_dict:
+        if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
+            neighbor_ip = routers_dict[neighbor]['loopback']
+            config.append(f"  network {neighbor_ip} mask 255.255.255.255")
+
+    # soi-meme 180.124.0.1 mask 255.255.255.255
+    config.append(f"  network {ip_loopback} 255.255.255.255")    
+
+
     config.append(" exit-address-family")
     config.append("!")
 
