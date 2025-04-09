@@ -94,16 +94,16 @@ def config_interface(interfaces, protocol,router_type):
 
 
 # Configure BGP Neighbor
-def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
+def config_bgp(protocol, all_routers, router, router_id, routers_dict):
     config = []
     current_as = routers_dict[router.name]['AS']
     if router.router_type == "PE":
-        config.append("router ospf 1")
+        config.append(f"router {protocol}")
         config.append(f" router-id {router_id} \n!")
         config.append(f"router bgp {current_as}")
         config.append(" bgp log-neighbor-changes")
     else :
-        config.append("router ospf 2")
+        config.append(f"router {protocol}")
         config.append(f" router-id {router_id} \n!")
 
 
@@ -123,7 +123,7 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
                 config.append(f"  network {neighbor_ip} mask 255.255.255.255")
 
         # soi-meme 180.124.0.1 mask 255.255.255.255
-        config.append(f"  network {loopback_dict[router.name]} 255.255.255.255")   
+        config.append(f"  network {routers_dict[router.name]["loopback"]} 255.255.255.255")   
 
         # ipv4
         for router1 in routers_dict:
@@ -151,7 +151,7 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
         for neighbor_PE in all_routers:
             if neighbor_PE.router_type == "PE" and neighbor_PE.name != router.name:
                 neighbor_name = neighbor_PE.name
-                neighbor_ip = loopback_dict[neighbor_name]
+                neighbor_ip = routers_dict[neighbor_name]["loopback"]
                 config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
                 config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n !")
                 config.append("address-family vpn4")
