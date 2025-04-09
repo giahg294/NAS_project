@@ -52,9 +52,9 @@ def config_loopback(ip_loopback, protocol, router_type):
     config.append("interface Loopback0")
     config.append(f" ip address {ip_loopback} 255.255.255.255")
     if router_type != "CE":
-        config.append(f" ip ospf 1 area 0")
+        config.append(f" ip {protocol} area 0")
     else :
-        config.append(f" ip ospf 2 area 0")
+        config.append(f" ip {protocol} area 0")
     config.append("!")
     return config
 
@@ -77,7 +77,7 @@ def config_interface(interfaces, protocol,router_type):
                 config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
                 
                 # config OSPF à optimiser
-                config.append(f" ip ospf 2 area 0")
+                config.append(f" ip {protocol} area 0")
             
             if interface['name'] == "FastEthernet0/0":
                 config.append(" duplex full")
@@ -129,7 +129,7 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
         for router1 in routers_dict:
             if routers_dict[router1]['AS'] == current_as and router1 == router.name:
                 for interface in router.interfaces :
-                    print(f"AAAARRRRGGG{interface}")
+                    # print(f"AAAARRRRGGG{interface}")
                     if 'ipv4_address' in interface.keys():
                         # print('OKOKOK')
                         config.append(f"  network {interface['ipv4_address']} mask 255.255.255.252")
