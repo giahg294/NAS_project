@@ -18,14 +18,15 @@ def config_head(name, router_type, clients, as_number): #ATTENTION : J'AI RAJOUT
     
     
     if router_type != "P":
-        for client in clients:
-            config.append(f"vrf definition {client}")
-            if router_type == "PE":
-                config.append(f" rd {as_number}:{client[7:]}00")
-                config.append(f" route-target export {as_number}:{client[7:]}000")
-                config.append(f" route-target import {as_number}:{client[7:]}000")
-            config.append(" !\n address-family ipv4\n exit-address-family\n!")
-            
+        if clients != []:
+            for client in clients.keys():
+                config.append(f"vrf definition {client}")
+                if router_type == "PE":
+                    config.append(f" rd {as_number}:{clients[client][0]}")
+                    config.append(f" route-target export {as_number}:{clients[client][1]}")
+                    config.append(f" route-target import {as_number}:{clients[client][1]}")
+                config.append(" !\n address-family ipv4\n exit-address-family\n!")
+                
     suite_config = ["no aaa new-model",
         "no ip icmp rate-limit unreachable",
         "ip cef",
@@ -105,45 +106,46 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
         config.append("router ospf 2")
         config.append(f" router-id {router_id} \n!")
 
-    for neighbor in routers_dict:
-        if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
-            neighbor_ip = routers_dict[neighbor]['loopback']
-            config.append("address-family ipv4 vrf NomClientàremplacer")
-            config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-            config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
 
-    config.append("!")
-    config.append(" address-family ipv4")
+    if router.router_type == "CE":
+        for neighbor in routers_dict:
+            if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
+                neighbor_ip = routers_dict[neighbor]['loopback']
+                config.append("address-family ipv4 vrf NomClientàremplacer")
+                config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
+                config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
+        config.append("!")
+        config.append(" address-family ipv4")
+        # neighbor 160.124.0.1 mask 255.255.255.255
+        for neighbor in routers_dict:
+            if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
+                neighbor_ip = routers_dict[neighbor]['loopback']
+                config.append(f"  network {neighbor_ip} mask 255.255.255.255")
 
-    # neighbor 160.124.0.1 mask 255.255.255.255
-    for neighbor in routers_dict:
-        if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
-            neighbor_ip = routers_dict[neighbor]['loopback']
-            config.append(f"  network {neighbor_ip} mask 255.255.255.255")
+        # soi-meme 180.124.0.1 mask 255.255.255.255
+        config.append(f"  network {loopback_dict[router.name]} 255.255.255.255")   
 
-    # soi-meme 180.124.0.1 mask 255.255.255.255
-    config.append(f"  network {loopback_dict[router.name]} 255.255.255.255")   
+        # ipv4
+        for router1 in routers_dict:
+            if routers_dict[router1]['AS'] == current_as and router1 == router.name:
+                for interface in router.interfaces :
+                    # print(interface['ipv4_address'])
+                    if interface['ipv4_address']!= "None" :
+                        # print('OKOKOK')
+                        config.append(f"  network {interface['ipv4_address']} mask 255.255.255.252")
+                        # print(config)
+                        # print(f"  network {interface['ipv4_address']} mask 255.255.255.252")
 
-    # ipv4
-    for router1 in routers_dict:
-        if routers_dict[router1]['AS'] == current_as and router1 == router.name:
-            for interface in router.interfaces :
-                # print(interface['ipv4_address'])
-                if interface['ipv4_address']!= "None" :
-                    # print('OKOKOK')
-                    config.append(f"  network {interface['ipv4_address']} mask 255.255.255.252")
-                    # print(config)
-                    # print(f"  network {interface['ipv4_address']} mask 255.255.255.252")
+        # neighbor:  activate & next-hop-self
+        for neighbor in routers_dict:
+            if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
+                neighbor_ip = routers_dict[neighbor]['loopback']
+                config.append(f"  neighbor {neighbor_ip} avtivate")     
+                config.append(f"  neighbor {neighbor_ip} next-hop-self")     
 
-    # neighbor:  activate & next-hop-self
-    for neighbor in routers_dict:
-        if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
-            neighbor_ip = routers_dict[neighbor]['loopback']
-            config.append(f"  neighbor {neighbor_ip} avtivate")     
-            config.append(f"  neighbor {neighbor_ip} next-hop-self")     
+        config.append(" exit-address-family")
+        config.append("!")
 
-    config.append(" exit-address-family")
-    config.append("!")
     if router.router_type == "PE":
         # On cherche tous les PE du réseau et on met leur addresse loopback en voisin BGP
         for neighbor_PE in all_routers:
@@ -151,7 +153,7 @@ def config_bgp(loopback_dict, all_routers, router, router_id, routers_dict):
                 neighbor_name = neighbor_PE.name
                 neighbor_ip = loopback_dict[neighbor_name]
                 config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-                config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
+                config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n !")
                 config.append("address-family vpn4")
                 config.append(f" neighbor {neighbor_ip} activate")
                 config.append(f" neighbor {neighbor_ip} send-community extended")
