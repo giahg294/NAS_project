@@ -60,6 +60,7 @@ def config_interface(interfaces, protocol):
     for interface in interfaces:
         config.append(f"interface {interface['name']}")
         if interface['neighbor'] == "None":
+            config.append(" no ip address")
             config.append(" shutdown")
         if interface["vrf"] != []:
             config.append(f" vrf forwarding {interface["vrf"]}")
@@ -69,12 +70,12 @@ def config_interface(interfaces, protocol):
         else:
             if interface['name'] == "FastEthernet0/0":
                 config.append(" duplex full")
-            else:
-                config.append(" negotiation auto")
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
             if protocol == "OSPF" and interface["vrf"] == []:
                 config.append(f" ip ospf 1 area 0")
+            if interface['name'] != "FastEthernet0/0":
+                config.append(" negotiation auto")
         config.append("!")
             
     
@@ -86,23 +87,21 @@ def config_bgp(router, router_id, routers_dict, router_type):
     config = []
     if router_type != "CE":
         config.append("router ospf 1")
-        config.append(f" router-id {router_id} \n!")
+        config.append(f" router-id {router_id} \n!")    
     # Configurer les voisins BGP
     current_as = routers_dict[router.name]['AS']
     config.append(f"router bgp {current_as}")
-    config.append(f" bgp router-id {router_id}")
     config.append(" bgp log-neighbor-changes")
+    #print(f"AAAAA{router}")
+    #if router_type == "PE":
 
     for neighbor in routers_dict:
         if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
             neighbor_ip = routers_dict[neighbor]['loopback']
+            config.append("address-family ipv4 vrf NomClientàremplacer")
             config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-            config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
-
-    config.append("!")
-    config.append(" address-family ipv4")
-    config.append(" exit-address-family")
-    config.append("!")
+            config.append(f" neighbor {neighbor_ip} update-source Loopback0")
+            config.append("exit-address-family \n!")
 
     return config
 
