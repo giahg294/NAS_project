@@ -136,15 +136,17 @@ def generate_vrf(as_index):
         
 
 # Génération d'un dictionnaire contenant les informations des routeurs
-def generate_routers_dict(all_as):
+def generate_routers_dict(all_as, connections_matrix):
     routers_dict = {}
     for as_obj in all_as:
         for router in as_obj.routers:
             # Génère l'adresse loopback pour chaque routeur
             loopback_address = generate_loopback(router.name, as_obj.loopback_range)
+            ipv4_address = generate_interface_addresses(as_obj, connections_matrix)
             router_dict = {
                 'loopback': loopback_address,  # Adresse loopback
-                'AS': as_obj.number  # Numéro de l'AS
+                'AS': as_obj.number,  # Numéro de l'AS
+                'ipv4': ipv4_address
             }
             routers_dict[router.name] = router_dict
     return routers_dict
