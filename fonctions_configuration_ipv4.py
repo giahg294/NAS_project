@@ -150,6 +150,7 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict):
         for neighbor_PE in all_routers:
             if neighbor_PE.router_type == "PE" and neighbor_PE.name != router.name:
                 neighbor_name = neighbor_PE.name
+                #neighbor_ip = addresse loopback
                 neighbor_ip = routers_dict[neighbor_name]["loopback"]
                 config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
                 config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n !")
@@ -160,6 +161,7 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict):
     
         for interface in router.interfaces:
             if interface["vrf"] != []:
+                #addresse ip = addresse physique
                 neighbor_name = interface["neighbor"]
                 as_vrf_neighbor = routers_dict[neighbor_name]['AS']
                 vrf_name = interface["vrf"]
