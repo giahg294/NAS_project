@@ -69,15 +69,14 @@ def config_interface(interfaces, protocol,router_type):
             config.append(" shutdown")
             config.append(" negotiation auto")
         
-        if interface["vrf"] != []:
-            config.append(f" vrf forwarding {interface["vrf"]}")
-        
         if interface['neighbor'] != "None":
             if 'ipv4_address' in interface.keys():
                 config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
                 
-                # config OSPF à optimiser
-                config.append(f" ip {protocol} area 0")
+                if interface["vrf"] != []:
+                    config.append(f" vrf forwarding {interface["vrf"]}")
+                else:    
+                    config.append(f" ip {protocol} area 0")
             
             if interface['name'] == "FastEthernet0/0":
                 config.append(" duplex full")
@@ -102,21 +101,37 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict):
         config.append(f" router-id {router_id} \n!")
         config.append(f"router bgp {current_as}")
         config.append(" bgp log-neighbor-changes")
-    else :
+    elif router.router_type == "CE" :
+        config.append(f"router {protocol}")
+        config.append(f" router-id {router_id} \n!")
+        config.append(f"router bgp {current_as}")
+        config.append(f" bgp router-id  {router_id}")
+        config.append(" bgp log-neighbor-changes")
+    elif router.router_type == "C" :
+        config.append(f"router {protocol}")
+        config.append(f" router-id {router_id} \n!")
+        config.append(f"router bgp {current_as}")
+        config.append(" bgp log-neighbor-changes")
+    elif router.router_type == "P" :
         config.append(f"router {protocol}")
         config.append(f" router-id {router_id} \n!")
 
 
+
     if router.router_type == "CE":
+        print(routers_dict)
         for neighbor in routers_dict:
+            print(neighbor)
             if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
                 neighbor_ip = routers_dict[neighbor]['loopback']
-                config.append("address-family ipv4 vrf NomClientàremplacer")
+
                 config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-                config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n!")
+                # if routers_dict[neighbor].router_type == "PE" :
+                config.append(f" neighbor {neighbor_ip} update-source Loopback0")
+        
         config.append("!")
         config.append(" address-family ipv4")
-        # neighbor 160.124.0.1 mask 255.255.255.255
+        # loopback de neighbor 160.124.0.1 mask 255.255.255.255
         for neighbor in routers_dict:
             if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
                 neighbor_ip = routers_dict[neighbor]['loopback']
