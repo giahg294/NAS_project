@@ -129,7 +129,7 @@ def generate_router_id(name):
 
 def generate_vrf(as_index):
     for router in as_index:
-        router.vrf
+        router.vrf = f"VRF_{router.name}"
         
 
 # Génération d'un dictionnaire contenant les informations des routeurs
