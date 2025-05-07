@@ -170,7 +170,7 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict):
                 neighbor_ip = routers_dict[neighbor_name]["loopback"]
                 config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
                 config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n !")
-                config.append("address-family vpn4")
+                config.append("address-family vpnv4")
                 config.append(f" neighbor {neighbor_ip} activate")
                 config.append(f" neighbor {neighbor_ip} send-community extended")
                 config.append("exit-address-family \n!")
