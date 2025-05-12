@@ -1,11 +1,14 @@
+import ipaddress
+
 # Définition de la classe Router (Routeur)
 class Router:
-    def __init__(self, name, router_type, vrf, interfaces):
+    def __init__(self, name, router_type, vrf, interfaces, neighbors):
         # Initialisation du routeur avec un nom, un type et des interfaces
         self.name = name  # Nom du routeur
         self.router_type = router_type  # Type de routeur (CE, PE, P)
         self.interfaces = interfaces  # Liste des interfaces associées au routeur
         self.vrf = vrf
+        self.neighbors = neighbors
 
     def __str__(self):
         # Représentation textuelle du routeur
@@ -13,20 +16,21 @@ class Router:
         
 # Définition de la classe AS (Système Autonome)
 class AS:
-    def __init__(self, number, ip_range, loopback_range, protocol, routers, relation):
+    def __init__(self, number, ip_range, loopback_range, border_range, protocol, routers, relation):
         # Initialisation de l'AS avec son numéro, plages d'adresses, protocole et routeurs
         self.number = number  # Numéro de l'AS
         self.ip_range = ip_range  # Plage d'adresses IP pour cet AS
         self.loopback_range = loopback_range  # Plage d'adresses loopback
+        self.border_range = border_range
         self.protocol = protocol  # Protocole utilisé (RIP, OSPF, etc.)
         # Création d'instances de routeurs pour cet AS
-        self.routers = [Router(router['name'], router['type'], router['vrf'], router['interfaces']) for router in routers]
+        self.routers = [Router(router['name'], router['type'], router['vrf'], router['interfaces'], router['neighbors']) for router in routers]
         self.relation = relation
 
     def __str__(self):
         # Représentation textuelle de l'AS
         router_str = '\n  '.join(str(router) for router in self.routers)
-        return f"AS(Number: {self.number}, IP Range: {self.ip_range}, Loopback Range: {self.loopback_range}, Protocol: {self.protocol}, Routers:\n  {router_str})"
+        return f"AS(Number: {self.number}, IP Range: {self.ip_range}, Loopback Range: {self.loopback_range}, Border Range: {self.border_range}, Protocol: {self.protocol}, Routers:\n  {router_str})"
 
 # Génération de la matrice de connexions avec noms des routeurs
 def generate_connections_matrix_name(routers, AS):
@@ -89,38 +93,55 @@ def generate_connections_matrix(routers, AS):
 # Génération de l'adresse loopback pour un routeur
 def generate_loopback(name, loopback_range):
     router_number = int(name[1:])  # Récupère le numéro du routeur
-    return f"{loopback_range[:-17]}{router_number}"  # Formate l'adresse loopback
+    return f"{loopback_range.split()[0].rsplit('.', 1)[0]}.{router_number}"  # Formate l'adresse loopback
 
 # Génération des adresses IPv4 pour les interfaces
 def generate_interface_addresses(as_info, connections_matrix):
-    ip_range = as_info.ip_range
-    i = 0
-    all_lien_as = []
-    all_lien = connections_matrix
-    traites = []
-    for lien in all_lien:
-        if lien[1] == as_info.number:
-            all_lien_as.append(lien[0])
+    used_ips = {}
+    used_subnets = {}
 
-    for lien in all_lien_as:
-        for router in lien:
-            for r in as_info.routers:
-                if router == int(r.name[1:]) and router not in traites:
-                    for interface in r.interfaces:
-                        if interface['neighbor'] != "None":
-                            if int(interface['neighbor'][1:]) == lien[0] or int(interface['neighbor'][1:])==lien[1]:
-                                i += 1
-                                ip = i
-                                ipv4_address = f"{ip_range[:-17]}{ip}"
-                                interface['ipv4_address'] = ipv4_address
-                                
-                            else:
-                                ip = i+3
-                                ipv4_address = f"{ip_range[:-17]}{ip}"
-                                interface['ipv4_address'] = ipv4_address
-                                i = ip
-            traites.append(router)
+    for lien in connections_matrix:
+        if lien[1] == "border":
+            ip_range_type = "border"
+            ip_range = as_info.border_range
+        else :
+            ip_range_type = as_info.number
+            ip_range = as_info.ip_range
 
+        if ip_range_type not in used_subnets:
+            used_subnets[ip_range_type] = []
+
+        i = 0
+        found = False
+
+        while not found and i < 63 :
+            if i not in used_subnets[ip_range_type]:
+                i1 = i*4+1
+                i2 = i*4+2
+                ip1 =  f"{ip_range.split()[0].rsplit('.', 1)[0]}.{i1}"
+                ip2 =  f"{ip_range.split()[0].rsplit('.', 1)[0]}.{i2}"
+
+                if ip1 not in used_ips and ip2 not in used_ips :
+                    found = True
+                    used_subnets[ip_range_type].append(i)
+
+                    r1, r2 = lien[0]
+                    r1_name = f"R{r1}"
+                    r2_name = f"R{r2}"
+
+                    for r in as_info.routers:
+                        if int(r.name[1:]) == r1:
+                            for interface in r.interfaces:
+                                if interface["neighbor"] == r2_name:
+                                    interface['ipv4_address'] = ip1
+                                    used_ips[ip1] = r.name
+
+                        if int(r.name[1:]) == r2:
+                            for interface in r.interfaces:
+                                if interface["neighbor"] == r1_name:
+                                    interface['ipv4_address'] = ip2
+                                    used_ips[ip2] = r.name
+            i+=1
 
 # Génération de l'ID routeur (Router ID)
 def generate_router_id(name):

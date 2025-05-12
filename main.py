@@ -21,7 +21,7 @@ if __name__ == "__main__":
         data = json.load(file)
 
     # Extraire les informations AS du JSON, créer des instances de la classe AS, les stocker dans la liste all_as
-    all_as = [AS(as_info['number'], as_info['IP_range'], as_info['loopback_range'], as_info['protocol'], as_info['routers'], as_info['relation'])
+    all_as = [AS(as_info['number'], as_info['IP_range'], as_info['loopback_range'], as_info['border_range'], as_info['protocol'], as_info['routers'], as_info['relation'])
               for as_info in data["AS"]]
 
     all_as_dict = generate_as_dict(all_as)
@@ -66,7 +66,7 @@ if __name__ == "__main__":
                 source_file.append(f"i{router.name[1:]}_startup-config.cfg")  # Ajouter le nom du fichier à la liste source_file
                 fichiers_config.append(f"i{router.name[1:]}_startup-config.cfg")
     
-    for i in range(len(fichiers_config)):
-        drag_file(i, fichiers_config)
+    # for i in range(len(fichiers_config)):
+    #     drag_file(i, fichiers_config)
 
         
