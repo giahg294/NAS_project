@@ -179,3 +179,15 @@ def generate_as_dict(all_as):
             router_liste.append(router.name)
         as_dico[as_obj.number] = {"routers":router_liste, "protocol":as_obj.protocol, "relation":as_obj.relation}
     return as_dico
+
+def generate_direct_neighbor(routers, AS):
+    neighbor_dico = {}
+    for router in routers:
+        neighbor_list = []
+        for interface in router.interfaces:
+            if interface['neighbor'] != "None":  # Vérifie si l'interface est connectée
+                neighbor_name = interface['neighbor']
+                neighbor_list.append(neighbor_name)
+        neighbor_dico[router.name] = neighbor_list
+    return neighbor_dico
+

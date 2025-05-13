@@ -94,7 +94,7 @@ def config_interface(interfaces, protocol,router_type):
 
 
 # Configure BGP Neighbor
-def config_bgp(protocol, all_routers, router, router_id, routers_dict):
+def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_neighbor_dico):
     config = []
     current_as = routers_dict[router.name]['AS']
     if router.router_type == "PE":
@@ -120,26 +120,29 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict):
 
 
     if router.router_type == "CE":
-        #print("ROUTERS_DICT ICIIIII")
-        #print(routers_dict)
-        for neighbor in routers_dict:
-            #print("NEIGHBOR ICIIIII")
-            #print(neighbor)
-            if neighbor != router.name :
-                neighbor_as = routers_dict[neighbor]['AS']
-                if neighbor_as == current_as:
-                    #RAJOUTER CONDITION ROUTEUR DAND MEME AREA
-                    neighbor_ip = routers_dict[neighbor]['loopback']
+        ###### Déclaration des neighbor ######
+        print("ICIIIII")
+        for neighbor_name in direct_neighbor_dico[router.name]:
+            neighbor_as = routers_dict[neighbor_name]['AS']
 
-                    config.append(f" neighbor {neighbor_ip} remote-as {neighbor_as}")
-                    # if routers_dict[neighbor].router_type == "PE" :
-                    config.append(f" neighbor {neighbor_ip} update-source Loopback0")
-                
-                    config.append(" ")
-                #else :
-                    #neighbor_ip = routers_dict[neighbor]['adress']
-                    #config.append(f" neighbor {neighbor_ip} remote-as {neighbor_as}")
-        
+            if neighbor_as == "10": #Si le neighbor est dans l'AS provider (C'est donc un PE car les P ne sont pas directement connectés aux P)
+                for neighbor in all_routers:
+                    if neighbor.name == neighbor_name: #On cherche l'objet Router correspondant à notre neighbor
+                        for neighbor_interface in neighbor.interfaces: # On regarde toutes les interfaces du voisin
+                            if neighbor_interface["neighbor"]==router.name: # On cherche l'interface du voisin qui est connectée au routeur qu'on est en train de traiter
+                                neighbor_ip = neighbor_interface["ipv4_address"] # On récupère l'addresse physique de l'interface du PE auquel le CE est connecté
+                                config.append(f" neighbor {neighbor_ip} remote-as {neighbor_as}")
+                                print(f"VOISIN PE de {router.name}:{neighbor_name} : {neighbor_ip}")
+
+            else: #Le neighbor est un C 
+                neighbor_ip = routers_dict[neighbor_name]['loopback'] # On veut l'addresse de loopback des C
+                config.append(f" neighbor {neighbor_ip} remote-as {neighbor_as}")
+                config.append(f" neighbor {neighbor_ip} update-source Loopback0")
+                config.append(" ")
+                print(f"VOISIN C de {router.name}:{neighbor_name} : {neighbor_ip}")
+
+
+        ###### Déclaration des networks ######
         config.append("!")
         config.append(" address-family ipv4")
         # loopback de neighbor 160.124.0.1 mask 255.255.255.255
