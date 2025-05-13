@@ -190,19 +190,18 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
 
 
     if router.router_type == "PE":
-        # On cherche tous les PE du réseau et on met leur addresse loopback en voisin BGP
-        for neighbor_PE in all_routers:
-            if neighbor_PE.router_type == "PE" and neighbor_PE.name != router.name:
-                neighbor_name = neighbor_PE.name
-                #neighbor_ip = addresse loopback
-                neighbor_ip = routers_dict[neighbor_name]["loopback"]
-                config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-                config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n !")
-                config.append("address-family vpnv4")
-                config.append(f" neighbor {neighbor_ip} activate")
-                config.append(f" neighbor {neighbor_ip} send-community extended")
-                config.append("exit-address-family \n!")
-    
+        # On cherche tous les P directement connectés au PE
+        for neighbor_name in direct_neighbor_dico[router.name]: # On parcourt tous les voisins du PE
+            for neighbor_P in all_routers: 
+                if neighbor_P.name == neighbor_name and neighbor_P.router_type == "P": # on récupère les voisins qui sont des P
+                    neighbor_ip = routers_dict[neighbor_name]["loopback"]
+                    config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
+                    config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n !")
+                    config.append("address-family vpnv4")
+                    config.append(f" neighbor {neighbor_ip} activate")
+                    config.append(f" neighbor {neighbor_ip} send-community extended")
+                    config.append("exit-address-family \n!")
+
         for interface in router.interfaces:
             if interface["vrf"] != []:
                 #addresse ip = addresse physique
