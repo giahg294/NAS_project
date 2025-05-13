@@ -121,6 +121,8 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
 
     if router.router_type == "CE":
         ###### Déclaration des neighbor ######
+        neighbor_PE = []
+        neighbor_C = []
         print("ICIIIII")
         for neighbor_name in direct_neighbor_dico[router.name]:
             neighbor_as = routers_dict[neighbor_name]['AS']
@@ -131,15 +133,17 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
                     if neighbor.name == neighbor_name: #On cherche l'objet Router correspondant à notre neighbor
                         for neighbor_interface in neighbor.interfaces: # On regarde toutes les interfaces du voisin
                             if neighbor_interface["neighbor"]==router.name: # On cherche l'interface du voisin qui est connectée au routeur qu'on est en train de traiter
-                                neighbor_ip = neighbor_interface["ipv4_address"] # On récupère l'addresse physique de l'interface du PE auquel le CE est connecté
-                                config.append(f" neighbor {neighbor_ip} remote-as {neighbor_as}")
-                                print(f"VOISIN PE de {router.name}:{neighbor_name} : {neighbor_ip}")
+                                neighbor_ip_PE = neighbor_interface["ipv4_address"] # On récupère l'addresse physique de l'interface du PE auquel le CE est connecté
+                                config.append(f" neighbor {neighbor_ip_PE} remote-as {neighbor_as}")
+                                neighbor_PE.append(neighbor_ip_PE)
+                                print(f"VOISIN PE de {router.name}:{neighbor_name} : {neighbor_ip_PE}")
 
             else: #Le neighbor est un C 
                 neighbor_ip = routers_dict[neighbor_name]['loopback'] # On veut l'addresse de loopback des C
                 config.append(f" neighbor {neighbor_ip} remote-as {neighbor_as}")
                 config.append(f" neighbor {neighbor_ip} update-source Loopback0")
                 config.append(" ")
+                neighbor_C.append(neighbor_ip)
                 print(f"VOISIN C de {router.name}:{neighbor_name} : {neighbor_ip}")
 
 
@@ -167,23 +171,13 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
         ip_loopback = routers_dict[router.name]['loopback']
         config.append(f"  network {ip_loopback} mask 255.255.255.255")
 
-        # ipv4
-        for router1 in routers_dict:
-            if routers_dict[router1]['AS'] == current_as and router1 == router.name:
-                for interface in router.interfaces :
-                    if 'ipv4_address' in interface.keys():
-                        # print('OKOKOK')
-                        config.append(f"  network {interface['ipv4_address']} mask 255.255.255.252")
-                        config.append(f"  {interface['ipv4_address']} allowas-in")
-                        # print(config)
-                        # print(f"  network {interface['ipv4_address']} mask 255.255.255.252")
-
         # neighbor:  activate & next-hop-self
-        for neighbor in routers_dict:
-            if routers_dict[neighbor]['AS'] == current_as and neighbor != router.name:
-                neighbor_ip = routers_dict[neighbor]['loopback']
-                config.append(f"  neighbor {neighbor_ip} activate")     
-                config.append(f"  neighbor {neighbor_ip} next-hop-self")     
+        for ip_C in neighbor_C:
+            config.append(f"  neighbor {ip_C} activate")     
+            config.append(f"  neighbor {ip_C} next-hop-self")   
+        for ip_PE in neighbor_PE:
+            config.append(f"  neighbor {ip_PE} activate")     
+            config.append(f"  neighbor {ip_PE} allowas-in")
 
         config.append(" exit-address-family")
         config.append("!")
