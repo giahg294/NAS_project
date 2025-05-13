@@ -167,7 +167,6 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
         ip_loopback = routers_dict[router.name]['loopback']
         config.append(f"  network {ip_loopback} mask 255.255.255.255")
 
-
         # ipv4
         for router1 in routers_dict:
             if routers_dict[router1]['AS'] == current_as and router1 == router.name:
@@ -188,6 +187,7 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
 
         config.append(" exit-address-family")
         config.append("!")
+
 
     if router.router_type == "PE":
         # On cherche tous les PE du réseau et on met leur addresse loopback en voisin BGP
@@ -215,8 +215,20 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
                 config.append(f" neighbor {vrf_ip} activate")
                 config.append("exit-address-family \n!")
 
-        if router.router_type == "C":
-            config.append("oju")
+    if router.router_type == "C":
+        ###### Déclaration des neighbor #######
+        # On déclare tous les C et CE qui sont du même côté du vpn (pour l'instant cela correspond à tous les voisins car les C ne sont connectés qu'avec des C et CE) 
+        # ATTENTION : Ne marche pas s"il y a des C du même côté du réseau qui ne lui sont pas directement connecté.    
+        print(f"Voisins du C : {router.name}")
+        for neighbor_name in direct_neighbor_dico[router.name]:
+                neighbor_loopback = routers_dict[neighbor_name]['loopback'] # On veut l'addresse de loopback des C
+                config.append(f" neighbor {neighbor_loopback} remote-as {current_as}")
+                config.append(f" neighbor {neighbor_loopback} update-source Loopback0 \n !")
+                print(f"{neighbor_name} : {neighbor_loopback}")
+
+                config.append(" address-family ipv4")
+                config.append(f"  neighbor {neighbor_loopback} activate")
+                config.append(" exit-address-family \n!")
 
     return config
 
