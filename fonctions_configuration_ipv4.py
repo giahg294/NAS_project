@@ -123,6 +123,7 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
         ###### Déclaration des neighbor ######
         neighbor_PE = []
         neighbor_C = []
+        direct_neihbor_C = []
         for neighbor_name in direct_neighbor_dico[router.name]:
             neighbor_as = routers_dict[neighbor_name]['AS']
 
@@ -135,6 +136,14 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
                                 neighbor_ip_PE = neighbor_interface["ipv4_address"] # On récupère l'addresse physique de l'interface du PE auquel le CE est connecté
                                 config.append(f" neighbor {neighbor_ip_PE} remote-as {neighbor_as}")
                                 neighbor_PE.append(neighbor_ip_PE)
+            else: # Si le voisinn'est pas un PE, c'est forcément un C
+                for neighbor in all_routers:
+                    if neighbor.name == neighbor_name: #On cherche l'objet Router correspondant à notre neighbor
+                        for neighbor_interface in neighbor.interfaces: # On regarde toutes les interfaces du voisin
+                            if neighbor_interface["neighbor"]==router.name: # On cherche l'interface du voisin qui est connectée au routeur qu'on est en train de traiter
+                                direct_c_ip = neighbor_interface["ipv4_address"] # On récupère l'addresse physique de l'interface du PE auquel le CE est connecté
+                                direct_neihbor_C.append(direct_c_ip)
+
 
         # On récupère tous les C de la même AS qui sont du même côté du réseau
         for c_a_decla in router.neighbors:
@@ -152,8 +161,12 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
         for ip_c in neighbor_C:
             config.append(f"  network {ip_c} mask 255.255.255.255")
         
-        for ip_pe in neighbor_PE:
-            config.append(f"  network {ip_pe} mask 255.255.255.252")                 
+        # Déclaration du lien physique entre tous les CE et C
+        for direct_ip_c in direct_neihbor_C:
+            config.append(f"  network {direct_ip_c} mask 255.255.255.252 NOUVEAUUUUU")
+
+        #for ip_pe in neighbor_PE:
+            #config.append(f"  network {ip_pe} mask 255.255.255.252")                 
 
         # Déclaration de la loopback du CE lui-même
         ip_loopback = routers_dict[router.name]['loopback']
@@ -162,10 +175,15 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
         # neighbor:  activate & next-hop-self
         for ip_C in neighbor_C:
             config.append(f"  neighbor {ip_C} activate")     
-            config.append(f"  neighbor {ip_C} next-hop-self")   
-        for ip_PE in neighbor_PE:
-            config.append(f"  neighbor {ip_PE} activate")     
-            config.append(f"  neighbor {ip_PE} allowas-in")
+            config.append(f"  neighbor {ip_C} next-hop-self")
+        
+        for ip_C_direct in direct_neihbor_C:
+            config.append(f"  neighbor {ip_C_direct} activate")     
+            config.append(f"  neighbor {ip_C_direct} allowas-in")
+
+        #for ip_PE in neighbor_PE:
+            #config.append(f"  neighbor {ip_PE} activate")     
+            #config.append(f"  neighbor {ip_PE} allowas-in")
 
         config.append(" exit-address-family")
         config.append("!")
