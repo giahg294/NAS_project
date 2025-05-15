@@ -51,8 +51,9 @@ def config_loopback(ip_loopback, protocol, router_type):
     config = []
     config.append("interface Loopback0")
     config.append(f" ip address {ip_loopback} 255.255.255.255")
-    if router_type != "PE":
-        config.append(f" ip {protocol} area 0")
+    config.append(f" ip {protocol} area 0")
+    #if router_type != "PE":
+        #config.append(f" ip {protocol} area 0")
     # else :
     #     config.append(f" ip {protocol} area 0")
     config.append("!")
@@ -70,15 +71,14 @@ def config_interface(interfaces, protocol,router_type):
             config.append(" shutdown")
             config.append(" negotiation auto")
         
-        if interface['neighbor'] != "None":
-            if 'ipv4_address' in interface.keys():
-                config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
-                
-                if interface["vrf"] != []:
-                    config.append(f" vrf forwarding {interface['vrf']}")
-                else:    
-                    config.append(f" ip {protocol} area 0")
-            
+        else:
+            if interface["vrf"] != []:
+                config.append(f" vrf forwarding {interface['vrf']}")
+            #if 'ipv4_address' in interface.keys():
+            config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
+            if interface["vrf"] == []:   
+                config.append(f" ip {protocol} area 0")   
+                 
             if interface['name'] == "FastEthernet0/0":
                 config.append(" duplex full")
             else:
@@ -196,6 +196,7 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
                 config.append(f" neighbor {vrf_ip} remote-as {as_vrf_neighbor}")
                 config.append(f" neighbor {vrf_ip} activate")
                 config.append("exit-address-family \n!")
+                print(f"routeur {router.name} : relié à {neighbor_name} par l'interface vrf = {interface["name"]} --> vrf ip : {vrf_ip}")
 
     if router.router_type == "C":
         ###### Déclaration des neighbor #######
