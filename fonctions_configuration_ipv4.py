@@ -204,17 +204,25 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
                 config.append("exit-address-family \n!")
 
         for interface in router.interfaces:
+            # On parcourt toutes les interfaces de notre routeur et on garde toutes celles qui correspondent à des vrf
             if interface["vrf"] != []:
                 #addresse ip = addresse physique
-                neighbor_name = interface["neighbor"]
-                as_vrf_neighbor = routers_dict[neighbor_name]['AS']
+                ce_name = interface["neighbor"] # on récupère le nom du CE voisin
+                as_vrf_neighbor = routers_dict[ce_name]['AS']
                 vrf_name = interface["vrf"]
-                vrf_ip = interface["ipv4_address"]
-                config.append(f"address-family ipv4 vrf {vrf_name}")
-                config.append(f" neighbor {vrf_ip} remote-as {as_vrf_neighbor}")
-                config.append(f" neighbor {vrf_ip} activate")
-                config.append("exit-address-family \n!")
-                print(f"routeur {router.name} : relié à {neighbor_name} par l'interface vrf = {interface["name"]} --> vrf ip : {vrf_ip}")
+                #vrf_ip = interface["ipv4_address"]
+                for rout in all_routers:
+                    if rout.name == ce_name: #On cherche l'objet Router correspondant à notre neighbor
+                        for ce_interface in rout.interfaces: # On regarde toutes les interfaces du voisin
+                            if ce_interface["neighbor"]==router.name: # On cherche l'interface du voisin qui est connectée au routeur qu'on est en train de traiter
+                                vrf_ip = ce_interface["ipv4_address"] # On récupère l'addresse physique de l'interface du PE auquel le CE est connecté
+                                config.append(f"address-family ipv4 vrf {vrf_name}")
+                                config.append(f" neighbor {vrf_ip} remote-as {as_vrf_neighbor}")
+                                config.append(f" neighbor {vrf_ip} activate")
+                                config.append("exit-address-family \n!")
+                                print(f"routeur {router.name} : relié à {ce_name} par l'interface vrf = {ce_interface["name"]} --> vrf ip : {vrf_ip}")
+
+                        
 
     if router.router_type == "C":
         ###### Déclaration des neighbor #######
