@@ -163,7 +163,7 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
         
         # Déclaration du lien physique entre tous les CE et C
         for direct_ip_c in direct_neihbor_C:
-            config.append(f"  network {direct_ip_c} mask 255.255.255.252 NOUVEAUUUUU")
+            config.append(f"  network {direct_ip_c} mask 255.255.255.252")
 
         #for ip_pe in neighbor_PE:
             #config.append(f"  network {ip_pe} mask 255.255.255.252")                 
