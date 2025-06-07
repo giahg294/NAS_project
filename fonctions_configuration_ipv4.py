@@ -163,7 +163,13 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
         
         # Déclaration du lien physique entre tous les CE et C
         for direct_ip_c in direct_neihbor_C:
-            config.append(f"  network {direct_ip_c} mask 255.255.255.252")
+            i = direct_ip_c.rsplit('.',3)[-1]
+            if int(i)%2 == 0 :
+                p = int(i)-2
+            else :
+                p = int(i)-1
+            ip = f"{direct_ip_c.rsplit('.',1)[0]}.{p}"
+            config.append(f"  network {ip} mask 255.255.255.252")
 
         #for ip_pe in neighbor_PE:
             #config.append(f"  network {ip_pe} mask 255.255.255.252")                 
@@ -174,16 +180,16 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
 
         # neighbor:  activate & next-hop-self
         for ip_C in neighbor_C:
-            config.append(f"  neighbor {ip_C} activate")     
+            config.append(f"  neighbor {ip_C} activate")  
             config.append(f"  neighbor {ip_C} next-hop-self")
         
-        for ip_C_direct in direct_neihbor_C:
-            config.append(f"  neighbor {ip_C_direct} activate")     
-            config.append(f"  neighbor {ip_C_direct} allowas-in")
+        #for ip_C_direct in direct_neihbor_C:
+        #    config.append(f"  neighbor {ip_C_direct} activate") 
+        #    config.append(f"  neighbor {ip_C_direct} allowas-in")
 
-        #for ip_PE in neighbor_PE:
-            #config.append(f"  neighbor {ip_PE} activate")     
-            #config.append(f"  neighbor {ip_PE} allowas-in")
+        for ip_PE in neighbor_PE:
+            config.append(f"  neighbor {ip_PE} activate")     
+            config.append(f"  neighbor {ip_PE} allowas-in")
 
         config.append(" exit-address-family")
         config.append("!")

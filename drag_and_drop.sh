@@ -1,6 +1,6 @@
 #si sur windows, taper la commande dos2unix drag_and_drop.sh avant de lancer le script
 
-nb_routers=8
+nb_routers=12
 config_files=()
 origin_directory=$(dirname "$0")
 
