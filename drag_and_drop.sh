@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #si sur windows, taper la commande dos2unix drag_and_drop.sh avant de lancer le script
 
 nb_routers=18
