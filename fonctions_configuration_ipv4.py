@@ -23,11 +23,6 @@ def config_head(name, router_type, clients, vrfs, as_number):
                 config.append(f"vrf definition {vrf}")
                 if router_type == "PE":
                     vrf_access = vrfs[vrf]
-                    # vrf_prop = clients[vrf]
-                    # vrf_prop = clients[client][0]
-                    # config.append(f" rd {as_number}:{clients[client][0]}")
-                    # config.append(f" route-target export {as_number}:{clients[client][1]}")
-                    # config.append(f" route-target import {as_number}:{clients[client][1]}")
                     config.append(f" rd {as_number}:{clients[vrf][0]}")
                     for vrf_a in vrf_access :
                         vrf_prop = clients[vrf_a]
@@ -64,10 +59,6 @@ def config_loopback(ip_loopback, protocol, router_type):
     config.append("interface Loopback0")
     config.append(f" ip address {ip_loopback} 255.255.255.255")
     config.append(f" ip {protocol} area 0")
-    #if router_type != "PE":
-        #config.append(f" ip {protocol} area 0")
-    # else :
-    #     config.append(f" ip {protocol} area 0")
     config.append("!")
     return config
 
@@ -86,7 +77,6 @@ def config_interface(interfaces, protocol,router_type):
         else:
             if interface["vrf"] != []:
                 config.append(f" vrf forwarding {interface['vrf']}")
-            #if 'ipv4_address' in interface.keys():
             config.append(f" ip address {interface['ipv4_address']} 255.255.255.252")
             if interface["vrf"] == []:   
                 config.append(f" ip {protocol} area 0")   
@@ -140,7 +130,6 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
             neighbor_as = routers_dict[neighbor_name]['AS']
 
             if neighbor_as == "10": #Si le neighbor est dans l'AS provider (C'est donc un PE car les P ne sont pas directement connectés aux P)
-                # Il faudrait faire une fonction pour la boucle suivante ... (Répétition avec déclaration des neighbor juste en-dessous)
                 for neighbor in all_routers:
                     if neighbor.name == neighbor_name: #On cherche l'objet Router correspondant à notre neighbor
                         for neighbor_interface in neighbor.interfaces: # On regarde toutes les interfaces du voisin
@@ -181,10 +170,7 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
             else :
                 p = int(i)-1
             ip = f"{direct_ip_c.rsplit('.',1)[0]}.{p}"
-            config.append(f"  network {ip} mask 255.255.255.252")
-
-        #for ip_pe in neighbor_PE:
-            #config.append(f"  network {ip_pe} mask 255.255.255.252")                 
+            config.append(f"  network {ip} mask 255.255.255.252")          
 
         # Déclaration de la loopback du CE lui-même
         ip_loopback = routers_dict[router.name]['loopback']
@@ -194,10 +180,6 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
         for ip_C in neighbor_C:
             config.append(f"  neighbor {ip_C} activate")  
             config.append(f"  neighbor {ip_C} next-hop-self")
-        
-        #for ip_C_direct in direct_neihbor_C:
-        #    config.append(f"  neighbor {ip_C_direct} activate") 
-        #    config.append(f"  neighbor {ip_C_direct} allowas-in")
 
         for ip_PE in neighbor_PE:
             config.append(f"  neighbor {ip_PE} activate")     

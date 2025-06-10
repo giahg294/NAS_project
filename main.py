@@ -2,7 +2,6 @@ import json
 import os 
 from address_allocator import * 
 from fonctions_configuration_ipv4 import *
-from drag_n_drop_bot import * 
 
 def create_folder(name):
     # Vérifier si le dossier 'projet-files' existe déjà
@@ -68,8 +67,4 @@ if __name__ == "__main__":
                 file.write('\n'.join(config))  # Écrire le contenu de la configuration
                 source_file.append(f"i{router.name[1:]}_startup-config.cfg")  # Ajouter le nom du fichier à la liste source_file
                 fichiers_config.append(f"i{router.name[1:]}_startup-config.cfg")
-    
-    # for i in range(len(fichiers_config)):
-    #     drag_file(i, fichiers_config)
 
-        
