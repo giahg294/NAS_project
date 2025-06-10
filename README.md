@@ -1,11 +1,11 @@
-# Projet NAS – BGP/MPLS VPN Automation
+# Projet NAS - BGP/MPLS VPN Automation
 
 ## Description du Projet NAS
 
-Ce projet vise à automatiser la configuration d’un réseau **IPv4 BGP/MPLS VPN** dans **GNS3**, en s’appuyant sur un fichier d’intention décrivant les AS, routeurs, interfaces, protocoles et VRFs.  
+Ce projet vise à automatiser la configuration d'un réseau **IPv4 BGP/MPLS VPN** dans **GNS3**, en s'appuyant sur un fichier d'intention décrivant les AS, routeurs, interfaces, protocoles et VRFs.  
 Le réseau met en place une architecture **provider / clients** avec **3 clients VPN distincts**, isolés via VRF.
 
-Les services réseau sont configurés automatiquement à l’aide de :
+Les services réseau sont configurés automatiquement à l'aide de :
 
 - **OSPFv2** pour le routage IGP interne,
 - **LDP** pour activer le transport MPLS,
@@ -16,9 +16,9 @@ Les services réseau sont configurés automatiquement à l’aide de :
 ## Structure du projet
 
 - `4routeurs.json`
-  Fichier d’intention décrivant la topologie réseau.  
-  Pour chaque AS : les routeurs, leur rôle (PE, P, CE, C), les vrfs, les interfaces, les voisins et les plages d’adresses IPv4 (interfaces et loopbacks).
-  Pour l’environnement inter-AS : les connexions entre routeurs de différents AS et les plages d’adresses IPv4 utilisées.
+  Fichier d'intention décrivant la topologie réseau.  
+  Pour chaque AS : les routeurs, leur rôle (PE, P, CE, C), les vrfs, les interfaces, les voisins et les plages d'adresses IPv4 (interfaces et loopbacks).
+  Pour l'environnement inter-AS : les connexions entre routeurs de différents AS et les plages d'adresses IPv4 utilisées.
   Le champ "all_clients" de chaque AS permet de préciser quels sont les AS auxquels chaque client peut accéder (à adapter pour du VPN sharing).
 
 - `main.py`
@@ -63,6 +63,6 @@ python3 main.py
 
 ## Auteurs
 
-Hoang Gia, Xu Yafei, Collet Marine, El Moukri Yassmine, Muccini Bianca – Étudiants 5TC, INSA Lyon  
+Hoang Gia, Xu Yafei, Collet Marine, El Moukri Yassmine, Muccini Bianca - Étudiants 3TC, INSA Lyon  
 Projet réalisé dans le cadre du module NAS, 2025  
 Encadrants : Pierre François et Victor Rébeq
