@@ -2,7 +2,7 @@ from address_allocator import *
 import ipaddress
 
 # Configurer l'en-tête du fichier
-def config_head(name, router_type, clients, as_number):
+def config_head(name, router_type, clients, vrfs, as_number):
     config = [
         "!\r"*3,
         "!",
@@ -18,13 +18,25 @@ def config_head(name, router_type, clients, as_number):
     
     
     if router_type != "P":
-        if clients != []:
-            for client in clients.keys():
-                config.append(f"vrf definition {client}")
+        if vrfs != []:
+            for vrf in vrfs.keys():
+                config.append(f"vrf definition {vrf}")
                 if router_type == "PE":
-                    config.append(f" rd {as_number}:{clients[client][0]}")
-                    config.append(f" route-target export {as_number}:{clients[client][1]}")
-                    config.append(f" route-target import {as_number}:{clients[client][1]}")
+                    vrf_access = vrfs[vrf]
+                    # vrf_prop = clients[vrf]
+                    # vrf_prop = clients[client][0]
+                    # config.append(f" rd {as_number}:{clients[client][0]}")
+                    # config.append(f" route-target export {as_number}:{clients[client][1]}")
+                    # config.append(f" route-target import {as_number}:{clients[client][1]}")
+                    config.append(f" rd {as_number}:{clients[vrf][0]}")
+                    for vrf_a in vrf_access :
+                        vrf_prop = clients[vrf_a]
+                        if vrf_a == vrf :
+                            config.append(f" route-target export {as_number}:{vrf_prop[1]}")
+                            config.append(f" route-target import {as_number}:{vrf_prop[1]}")
+                        else :
+                            config.append(f" route-target import {as_number}:{vrf_prop[1]}")
+
                 config.append(" !\n address-family ipv4\n exit-address-family\n!")
                 
     suite_config = ["no aaa new-model",
@@ -203,11 +215,15 @@ def config_bgp(protocol, all_routers, router, router_id, routers_dict, direct_ne
                 #neighbor_ip = addresse loopback
                 neighbor_ip = routers_dict[neighbor_name]["loopback"]
                 config.append(f" neighbor {neighbor_ip} remote-as {current_as}")
-                config.append(f" neighbor {neighbor_ip} update-source Loopback0 \n !")
-                config.append("address-family vpnv4")
+                config.append(f" neighbor {neighbor_ip} update-source Loopback0")
+        config.append(" !\naddress-family vpnv4")
+        for neighbor_PE in all_routers:
+            if neighbor_PE.router_type == "PE" and neighbor_PE.name != router.name:
+                neighbor_name = neighbor_PE.name
+                neighbor_ip = routers_dict[neighbor_name]["loopback"]
                 config.append(f" neighbor {neighbor_ip} activate")
                 config.append(f" neighbor {neighbor_ip} send-community extended")
-                config.append("exit-address-family \n!")
+        config.append("exit-address-family \n!")
 
         for interface in router.interfaces:
             # On parcourt toutes les interfaces de notre routeur et on garde toutes celles qui correspondent à des vrf

@@ -21,7 +21,7 @@ if __name__ == "__main__":
         data = json.load(file)
 
     # Extraire les informations AS du JSON, créer des instances de la classe AS, les stocker dans la liste all_as
-    all_as = [AS(as_info['number'], as_info['IP_range'], as_info['loopback_range'], as_info['border_range'], as_info['protocol'], as_info['routers'], as_info['relation'])
+    all_as = [AS(as_info['number'], as_info['IP_range'], as_info['loopback_range'], as_info['border_range'], as_info['protocol'], as_info['all_clients'], as_info['routers'], as_info['relation'])
               for as_info in data["AS"]]
 
     all_as_dict = generate_as_dict(all_as)
@@ -57,7 +57,7 @@ if __name__ == "__main__":
             config = []  # Créer une liste vide pour la configuration
             # Ajouter successivement les configurations de l'en-tête, loopback, interfaces, BGP et de fin
 
-            config.extend(config_head(router.name, router.router_type, router.vrf, as_index.number))
+            config.extend(config_head(router.name, router.router_type, as_index.all_clients, router.vrf, as_index.number))
             config.extend(config_loopback(routers_info[router.name]["loopback"], as_index.protocol, router.router_type))
             config.extend(config_interface(router.interfaces, as_index.protocol, router.router_type))
             config.extend(config_bgp(as_index.protocol, all_routers, router, router_id, routers_info, direct_neighbor_dico))
